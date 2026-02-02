@@ -1,0 +1,39 @@
+---
+title: Hello World
+description: Welcome to the Statecharts blog
+date: 2026-02-02
+author: Statecharts Team
+tags:
+  - announcement
+---
+
+Welcome to the Statecharts blog! This is where we'll share updates, tutorials, and deep dives into state machines and statecharts.
+
+## What to Expect
+
+We'll cover topics like:
+
+- Getting started with statecharts
+- Advanced patterns and techniques
+- Real-world use cases
+- Release announcements
+
+## Code Examples
+
+Here's a simple state machine definition:
+
+```typescript
+const toggleMachine = {
+  initial: "inactive",
+  states: {
+    inactive: {
+      on: { TOGGLE: "active" }
+    },
+    active: {
+      on: { TOGGLE: "inactive" }
+    }
+  }
+};
+```
+
+Stay tuned for more posts!

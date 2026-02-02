@@ -96,8 +96,8 @@ function InstallTabs() {
         ))}
       </div>
       <div className="flex items-center justify-between px-4 py-3">
-        <code className="text-xs text-neutral-300">{installCommands[active].command}</code>
-        <CopyButton text={installCommands[active].command} />
+        <code className="text-xs text-neutral-300">{installCommands[active]?.command}</code>
+        <CopyButton text={installCommands[active]?.command ?? ""} />
       </div>
     </div>
   );
