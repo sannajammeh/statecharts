@@ -22,6 +22,8 @@ bun install              # Install deps
 npm run dev              # Dev all packages
 npm run build            # Build all (cached)
 npm run lint             # ESLint (--max-warnings 0)
+npm run check            # Biome format + lint
+npm run format           # Biome format only
 npm run check-types      # TS check all
 
 # Filter to specific package
@@ -57,14 +59,21 @@ export const Button = ({ children, appName }: ButtonProps) => {
 - ES2022 target, NodeNext module resolution
 - Declaration maps enabled
 
-### Linting
-- ESLint 9 flat config format
+### Linting & Formatting
+- Biome for formatting + linting (replaces Prettier)
+- ESLint 9 flat config for React/Next.js-specific rules
+- Tailwind class sorting via `useSortedClasses` rule
 - Zero warnings policy enforced
-- Plugins: React, React Hooks, Next.js, TypeScript ESLint, Turbo
+
+### Styling
+- Tailwind CSS v4 (beta)
+- CSS-first configuration via `@theme` directive
+- Dark mode via `prefers-color-scheme`
+- Scans `apps/web` and `packages/ui` for Tailwind classes
 
 ## Conventions
 
 - Internal packages use `@statecharts/` prefix
 - ESM only (type: "module")
-- CSS modules for styles (e.g., `page.module.css`)
+- Tailwind CSS v4 for styling
 - Bun as package manager (don't modify bun.lock manually)
