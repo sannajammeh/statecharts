@@ -4,20 +4,18 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
-    "build": "next build",
-    "start": "next start",
+    "dev": "astro dev --port 3000",
+    "build": "astro build",
+    "preview": "astro preview",
     "lint": "eslint --max-warnings 0",
-    "check-types": "next typegen && tsc --noEmit",
-    "test": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "check-types": "astro check && tsc --noEmit"
   },
   "dependencies": {
+    "@astrojs/mdx": "^4.3.13",
+    "@astrojs/react": "^4.4.2",
+    "@astrojs/rss": "^4.0.15",
     "@statecharts/core": "*",
-    "@statecharts/ui": "*",
-    "gray-matter": "^4.0.3",
-    "next": "16.1.6",
-    "next-mdx-remote": "^5.0.0",
+    "astro": "^5.17.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "sugar-high": "^0.9.5"
@@ -25,12 +23,11 @@
   "devDependencies": {
     "@statecharts/eslint-config": "*",
     "@statecharts/typescript-config": "*",
-    "@tailwindcss/postcss": "latest",
-    "@types/node": "^22.15.3",
+    "@tailwindcss/vite": "^4.1.18",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
     "eslint": "^9.39.1",
-    "tailwindcss": "latest",
+    "tailwindcss": "^4.1.18",
     "typescript": "5.9.2"
   }
 }
