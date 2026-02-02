@@ -47,6 +47,7 @@
       "name": "web",
       "version": "0.1.0",
       "dependencies": {
+        "@statecharts/core": "*",
         "@statecharts/ui": "*",
         "gray-matter": "^4.0.3",
         "next": "16.1.6",

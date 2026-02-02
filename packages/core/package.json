@@ -7,11 +7,12 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./schema.json": "./schema.json"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": ["dist", "schema.json"],
   "scripts": {
     "build": "rolldown -c",
     "check-types": "tsc --noEmit",
