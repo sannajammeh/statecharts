@@ -103,8 +103,12 @@ export function App(): React.JSX.Element {
         setError(null);
         const data = JSON.parse(e.target?.result as string) as ExportedChart;
         setChart(data);
-      } catch {
-        setError("Invalid JSON file");
+      } catch (err) {
+        const message =
+          err instanceof Error
+            ? `Invalid JSON file: ${err.message}`
+            : "Invalid JSON file";
+        setError(message);
       }
     };
     reader.readAsText(file);
