@@ -156,6 +156,30 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Open Standard */}
+        <section className="mt-12">
+          <h2 className="text-xs font-bold uppercase tracking-widest">Open Standard</h2>
+          <div className="mt-4 border border-neutral-800 p-6">
+            <p className="text-sm text-neutral-400">
+              Statecharts.sh defines a JSON Schema for statechart exports, enabling validation,
+              editor autocomplete, and interoperability between tools.
+            </p>
+            <p className="mt-4 text-sm text-neutral-400">
+              Use the schema to validate your statechart definitions, generate documentation, or
+              build custom tooling around the standard format.
+            </p>
+            <div className="mt-6 flex items-center justify-between border border-neutral-800 px-4 py-3">
+              <span className="text-xs uppercase tracking-wide">JSON Schema</span>
+              <a
+                href="/schema.json"
+                className="flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200"
+              >
+                /schema.json <span>→</span>
+              </a>
+            </div>
+          </div>
+        </section>
+
         {/* Coming Soon - Visualizer */}
         <section className="mt-12">
           <h2 className="text-xs font-bold uppercase tracking-widest">Visualizer</h2>

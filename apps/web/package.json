@@ -13,6 +13,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@statecharts/core": "*",
     "@statecharts/ui": "*",
     "next": "16.1.6",
     "react": "^19.2.0",
