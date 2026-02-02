@@ -77,3 +77,7 @@ export const Button = ({ children, appName }: ButtonProps) => {
 - ESM only (type: "module")
 - Tailwind CSS v4 for styling
 - Bun as package manager (don't modify bun.lock manually)
+
+## Testing
+
+- Browser-related features: verify w/ agent-browser skill
