@@ -59,6 +59,13 @@ export const Button = ({ children, appName }: ButtonProps) => {
 - ES2022 target, NodeNext module resolution
 - Declaration maps enabled
 
+
+## Package installation
+
+- Always run `npm view <package-name> version` to get the latest version of the package you're installing.
+- Always assume that you're running in a sandbox. If install step fails, do not try again. Prompt user to run install script. 
+
+
 ### Linting & Formatting
 - Biome for formatting + linting (replaces Prettier)
 - ESLint 9 flat config for React/Next.js-specific rules
