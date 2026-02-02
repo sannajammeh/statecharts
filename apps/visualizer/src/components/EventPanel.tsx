@@ -1,4 +1,7 @@
 import type React from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface AvailableEvent {
   event: string;
@@ -14,32 +17,39 @@ interface EventPanelProps {
 export function EventPanel({ events, onSend }: EventPanelProps): React.JSX.Element {
   if (events.length === 0) {
     return (
-      <div className="p-3 bg-gray-100 rounded text-sm text-gray-500">
-        No available events
-      </div>
+      <Card>
+        <CardContent className="p-3">
+          <p className="text-muted-foreground text-sm">No available events</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="space-y-2">
-      <div className="text-xs font-semibold text-gray-600 uppercase">
-        Available Events
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {events.map((e) => (
-          <button
-            key={`${e.event}-${e.target}`}
-            type="button"
-            onClick={() => onSend(e.event)}
-            className="px-3 py-1.5 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors font-mono"
-          >
-            {e.event}
-            {e.guard && (
-              <span className="text-blue-200 ml-1">[{e.guard}]</span>
-            )}
-          </button>
-        ))}
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="font-semibold text-xs uppercase">Available Events</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-wrap gap-2">
+          {events.map((e) => (
+            <Button
+              key={`${e.event}-${e.target}`}
+              type="button"
+              variant="default"
+              onClick={() => onSend(e.event)}
+              className="font-mono"
+            >
+              {e.event}
+              {e.guard && (
+                <Badge variant="secondary" className="ml-1">
+                  {e.guard}
+                </Badge>
+              )}
+            </Button>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -8,26 +8,34 @@ import {
   ReactFlowProvider,
   useEdgesState,
   useNodesState,
+  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import type React from "react";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ContextPanel } from "./components/ContextPanel";
 import { EventPanel } from "./components/EventPanel";
 import { HistoryControls } from "./components/HistoryControls";
-import { StateNode } from "./components/StateNode";
-import { TransitionEdge } from "./components/TransitionEdge";
+import { StateNode as StateNodeComponent } from "./components/StateNode";
+import { TransitionEdge as TransitionEdgeComponent } from "./components/TransitionEdge";
+import { useAutoLayout } from "./hooks/useAutoLayout";
 import { useSimulation } from "./hooks/useSimulation";
 import type { VisualizerProps } from "./types";
-import { chartToEdges, chartToNodes } from "./utils/chartToFlow";
+import {
+  chartToEdges,
+  chartToNodes,
+  mergeNodeData,
+  type StateNode,
+  type TransitionEdge,
+} from "./utils/chartToFlow";
 
 const nodeTypes = {
-  state: StateNode,
-  group: StateNode,
+  state: StateNodeComponent,
+  group: StateNodeComponent,
 };
 
 const edgeTypes = {
-  transition: TransitionEdge,
+  transition: TransitionEdgeComponent,
 };
 
 function VisualizerInner({
@@ -48,19 +56,54 @@ function VisualizerInner({
     canGoForward,
   } = useSimulation(chart, onStateChange);
 
-  const initialNodes = useMemo(
-    () => chartToNodes(chart, activeStates),
-    [chart, activeStates]
-  );
+  const { fitView } = useReactFlow();
 
-  const initialEdges = useMemo(() => chartToEdges(chart), [chart]);
+  // Generate base nodes/edges from chart (no layout yet)
+  const baseNodes = useMemo(() => chartToNodes(chart, activeStates), [chart, activeStates]);
+  const baseEdges = useMemo(() => chartToEdges(chart), [chart]);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState<StateNode>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<TransitionEdge>([]);
+  const [isLayoutComplete, setIsLayoutComplete] = useState(false);
 
+  const { layout, isLayouting } = useAutoLayout({ setNodes, setEdges, fitView });
+
+  // Initial layout when chart changes or on first mount
   useEffect(() => {
-    setNodes(chartToNodes(chart, activeStates));
-  }, [chart, activeStates, setNodes]);
+    // Only run initial layout when we have nodes but no positions yet
+    if (baseNodes.length > 0 && !isLayoutComplete && !isLayouting) {
+      const runLayout = async () => {
+        await layout({
+          nodes: baseNodes,
+          edges: baseEdges,
+          direction: "vertical",
+          spacing: { x: 180, y: 150 },
+        });
+        setIsLayoutComplete(true);
+      };
+      void runLayout();
+    }
+  }, [chart, baseNodes, baseEdges, layout, isLayoutComplete, isLayouting]);
+
+  // Update node data (active states) without resetting positions
+  useEffect(() => {
+    if (isLayoutComplete && !isLayouting) {
+      setNodes((prevNodes) => mergeNodeData(prevNodes, chartToNodes(chart, activeStates)));
+    }
+  }, [activeStates, chart, isLayoutComplete, isLayouting, setNodes]);
+
+  // Reset layout - force re-layout with current nodes
+  const resetLayout = useCallback(() => {
+    setIsLayoutComplete(false);
+    void layout({
+      nodes: baseNodes,
+      edges: baseEdges,
+      direction: "vertical",
+      spacing: { x: 180, y: 150 },
+    }).then(() => {
+      setIsLayoutComplete(true);
+    });
+  }, [baseNodes, baseEdges, layout]);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -84,7 +127,7 @@ function VisualizerInner({
 
   return (
     <div className={`flex h-full w-full ${themeClasses} ${className}`}>
-      <div className="flex-1 relative">
+      <div className="relative flex-1">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -104,19 +147,17 @@ function VisualizerInner({
           <MiniMap />
         </ReactFlow>
       </div>
-      <div className="w-72 border-l border-gray-200 p-4 space-y-6 overflow-auto">
+      <div className="w-72 space-y-6 overflow-auto border-gray-200 border-l p-4">
         <HistoryControls
           onBack={back}
           onForward={forward}
           onReset={reset}
+          onResetLayout={resetLayout}
           canGoBack={canGoBack}
           canGoForward={canGoForward}
         />
         <EventPanel events={availableEvents} onSend={send} />
-        <ContextPanel
-          context={currentState.context}
-          currentState={currentState.value}
-        />
+        <ContextPanel context={currentState.context} currentState={currentState.value} />
       </div>
     </div>
   );

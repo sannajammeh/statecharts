@@ -1,34 +1,37 @@
 import type React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 interface ContextPanelProps {
   context: unknown;
   currentState: string | Record<string, unknown>;
 }
 
-export function ContextPanel({
-  context,
-  currentState,
-}: ContextPanelProps): React.JSX.Element {
+export function ContextPanel({ context, currentState }: ContextPanelProps): React.JSX.Element {
   return (
-    <div className="space-y-3 text-sm">
-      <div>
-        <div className="text-xs font-semibold text-gray-600 uppercase mb-1">
-          Current State
+    <Card>
+      <CardHeader>
+        <CardTitle className="font-semibold text-xs uppercase">Current State</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="rounded bg-muted p-2 font-mono text-sm">
+          {typeof currentState === "string" ? currentState : JSON.stringify(currentState, null, 2)}
         </div>
-        <div className="font-mono bg-gray-100 p-2 rounded">
-          {typeof currentState === "string"
-            ? currentState
-            : JSON.stringify(currentState, null, 2)}
-        </div>
-      </div>
-      <div>
-        <div className="text-xs font-semibold text-gray-600 uppercase mb-1">
-          Context
-        </div>
-        <pre className="font-mono bg-gray-100 p-2 rounded text-xs overflow-auto max-h-40">
-          {JSON.stringify(context, null, 2)}
-        </pre>
-      </div>
-    </div>
+      </CardContent>
+
+      <Separator />
+
+      <CardHeader>
+        <CardTitle className="font-semibold text-xs uppercase">Context</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ScrollArea className="h-40">
+          <pre className="rounded bg-muted p-2 font-mono text-xs">
+            {JSON.stringify(context, null, 2)}
+          </pre>
+        </ScrollArea>
+      </CardContent>
+    </Card>
   );
 }
