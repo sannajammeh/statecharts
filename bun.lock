@@ -10,37 +10,18 @@
         "typescript": "5.9.2",
       },
     },
-    "apps/docs": {
-      "name": "docs",
-      "version": "0.1.0",
-      "dependencies": {
-        "@repo/ui": "*",
-        "next": "16.1.0",
-        "react": "^19.2.0",
-        "react-dom": "^19.2.0",
-      },
-      "devDependencies": {
-        "@repo/eslint-config": "*",
-        "@repo/typescript-config": "*",
-        "@types/node": "^22.15.3",
-        "@types/react": "19.2.2",
-        "@types/react-dom": "19.2.2",
-        "eslint": "^9.39.1",
-        "typescript": "5.9.2",
-      },
-    },
     "apps/web": {
       "name": "web",
       "version": "0.1.0",
       "dependencies": {
-        "@repo/ui": "*",
+        "@statecharts/ui": "*",
         "next": "16.1.0",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
       },
       "devDependencies": {
-        "@repo/eslint-config": "*",
-        "@repo/typescript-config": "*",
+        "@statecharts/eslint-config": "*",
+        "@statecharts/typescript-config": "*",
         "@types/node": "^22.15.3",
         "@types/react": "19.2.2",
         "@types/react-dom": "19.2.2",
@@ -49,7 +30,7 @@
       },
     },
     "packages/eslint-config": {
-      "name": "@repo/eslint-config",
+      "name": "@statecharts/eslint-config",
       "version": "0.0.0",
       "devDependencies": {
         "@eslint/js": "^9.39.1",
@@ -66,19 +47,19 @@
       },
     },
     "packages/typescript-config": {
-      "name": "@repo/typescript-config",
+      "name": "@statecharts/typescript-config",
       "version": "0.0.0",
     },
     "packages/ui": {
-      "name": "@repo/ui",
+      "name": "@statecharts/ui",
       "version": "0.0.0",
       "dependencies": {
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
       },
       "devDependencies": {
-        "@repo/eslint-config": "*",
-        "@repo/typescript-config": "*",
+        "@statecharts/eslint-config": "*",
+        "@statecharts/typescript-config": "*",
         "@types/node": "^22.15.3",
         "@types/react": "19.2.2",
         "@types/react-dom": "19.2.2",
@@ -192,11 +173,11 @@
 
     "@nodelib/fs.walk": ["@nodelib/fs.walk@1.2.8", "", { "dependencies": { "@nodelib/fs.scandir": "2.1.5", "fastq": "^1.6.0" } }, "sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg=="],
 
-    "@repo/eslint-config": ["@repo/eslint-config@workspace:packages/eslint-config"],
+    "@statecharts/eslint-config": ["@statecharts/eslint-config@workspace:packages/eslint-config"],
 
-    "@repo/typescript-config": ["@repo/typescript-config@workspace:packages/typescript-config"],
+    "@statecharts/typescript-config": ["@statecharts/typescript-config@workspace:packages/typescript-config"],
 
-    "@repo/ui": ["@repo/ui@workspace:packages/ui"],
+    "@statecharts/ui": ["@statecharts/ui@workspace:packages/ui"],
 
     "@swc/helpers": ["@swc/helpers@0.5.15", "", { "dependencies": { "tslib": "^2.8.0" } }, "sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g=="],
 
@@ -305,8 +286,6 @@
     "define-properties": ["define-properties@1.2.1", "", { "dependencies": { "define-data-property": "^1.0.1", "has-property-descriptors": "^1.0.0", "object-keys": "^1.1.1" } }, "sha512-8QmQKqEASLd5nx0U1B1okLElbUuuttJ/AnYmRXbbbGDWh6uS208EjD4Xqq/I9wK7u0v6O08XhTWnt5XtEbR6Dg=="],
 
     "detect-libc": ["detect-libc@2.1.2", "", {}, "sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ=="],
-
-    "docs": ["docs@workspace:apps/docs"],
 
     "doctrine": ["doctrine@2.1.0", "", { "dependencies": { "esutils": "^2.0.2" } }, "sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw=="],
 

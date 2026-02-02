@@ -10,7 +10,7 @@ Turborepo monorepo w/ Next.js 16 app + shared React 19 UI library. TypeScript-st
 
 ```
 apps/web/           # Next.js app (App Router)
-packages/ui/        # React component library (@repo/ui)
+packages/ui/        # React component library (@statecharts/ui)
 packages/eslint-config/      # Shared ESLint configs
 packages/typescript-config/  # Shared TS configs
 ```
@@ -26,7 +26,7 @@ npm run check-types      # TS check all
 
 # Filter to specific package
 turbo build --filter=web
-turbo dev --filter=@repo/ui
+turbo dev --filter=@statecharts/ui
 
 # Generate new component
 cd packages/ui && npm run generate:component
@@ -64,7 +64,7 @@ export const Button = ({ children, appName }: ButtonProps) => {
 
 ## Conventions
 
-- Internal packages use `@repo/` prefix
+- Internal packages use `@statecharts/` prefix
 - ESM only (type: "module")
 - CSS modules for styles (e.g., `page.module.css`)
 - Bun as package manager (don't modify bun.lock manually)
