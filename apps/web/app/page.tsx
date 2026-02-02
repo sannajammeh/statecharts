@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { highlight } from "sugar-high";
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -44,6 +45,35 @@ const installCommands = [
   { label: "pnpm", command: "pnpm add statecharts" },
   { label: "bun", command: "bun add statecharts" },
 ] as const;
+
+const trafficLightExample = `import { chart } from "@statecharts/core"
+
+const trafficLight = chart({
+  context: {},
+  initial: "red",
+  states: {
+    red: { on: { TIMER: "green" } },
+    green: { on: { TIMER: "yellow" } },
+    yellow: { on: { TIMER: "red" } },
+  }
+})
+
+const instance = trafficLight.start()
+instance.send("TIMER")  // → green`;
+
+function CodeBlock({ code, filename }: { code: string; filename: string }) {
+  const html = highlight(code);
+  return (
+    <div className="mt-6 border border-neutral-800 bg-neutral-900">
+      <div className="border-b border-neutral-800 px-3 py-2 text-xs text-neutral-500">
+        {filename}
+      </div>
+      <pre className="overflow-x-auto p-3 text-xs leading-relaxed">
+        <code dangerouslySetInnerHTML={{ __html: html }} />
+      </pre>
+    </div>
+  );
+}
 
 function InstallTabs() {
   const [active, setActive] = useState(0);
@@ -122,94 +152,7 @@ export default function Home() {
               rest: which transitions are valid, what state you&apos;re in, and what happens next.
             </p>
 
-            {/* Code Example */}
-            <div className="mt-6 border border-neutral-800 bg-neutral-900">
-              <div className="border-b border-neutral-800 px-3 py-2 text-xs text-neutral-500">
-                traffic-light.ts
-              </div>
-              <pre className="overflow-x-auto p-3 text-xs leading-relaxed">
-                <code>
-                  <span className="text-blue-400">import</span>
-                  <span className="text-neutral-500">{" { "}</span>
-                  <span className="text-neutral-300">chart</span>
-                  <span className="text-neutral-500">{" } "}</span>
-                  <span className="text-blue-400">from</span>{" "}
-                  <span className="text-green-400">&quot;@statecharts/core&quot;</span>
-                  {"\n\n"}
-                  <span className="text-blue-400">const</span>{" "}
-                  <span className="text-neutral-300">trafficLight</span>{" "}
-                  <span className="text-neutral-500">=</span>{" "}
-                  <span className="text-yellow-400">chart</span>
-                  <span className="text-neutral-500">{"({"}</span>
-                  {"\n"}
-                  {"  "}
-                  <span className="text-neutral-300">context</span>
-                  <span className="text-neutral-500">: {"{}"},</span>
-                  {"\n"}
-                  {"  "}
-                  <span className="text-neutral-300">initial</span>
-                  <span className="text-neutral-500">:</span>{" "}
-                  <span className="text-green-400">&quot;red&quot;</span>
-                  <span className="text-neutral-500">,</span>
-                  {"\n"}
-                  {"  "}
-                  <span className="text-neutral-300">states</span>
-                  <span className="text-neutral-500">: {"{"}</span>
-                  {"\n"}
-                  {"    "}
-                  <span className="text-green-400">red</span>
-                  <span className="text-neutral-500">: {"{"}</span>{" "}
-                  <span className="text-neutral-300">on</span>
-                  <span className="text-neutral-500">: {"{"}</span>{" "}
-                  <span className="text-green-400">TIMER</span>
-                  <span className="text-neutral-500">:</span>{" "}
-                  <span className="text-green-400">&quot;green&quot;</span>{" "}
-                  <span className="text-neutral-500">{"}"} {"}"},</span>
-                  {"\n"}
-                  {"    "}
-                  <span className="text-green-400">green</span>
-                  <span className="text-neutral-500">: {"{"}</span>{" "}
-                  <span className="text-neutral-300">on</span>
-                  <span className="text-neutral-500">: {"{"}</span>{" "}
-                  <span className="text-green-400">TIMER</span>
-                  <span className="text-neutral-500">:</span>{" "}
-                  <span className="text-green-400">&quot;yellow&quot;</span>{" "}
-                  <span className="text-neutral-500">{"}"} {"}"},</span>
-                  {"\n"}
-                  {"    "}
-                  <span className="text-green-400">yellow</span>
-                  <span className="text-neutral-500">: {"{"}</span>{" "}
-                  <span className="text-neutral-300">on</span>
-                  <span className="text-neutral-500">: {"{"}</span>{" "}
-                  <span className="text-green-400">TIMER</span>
-                  <span className="text-neutral-500">:</span>{" "}
-                  <span className="text-green-400">&quot;red&quot;</span>{" "}
-                  <span className="text-neutral-500">{"}"} {"}"},</span>
-                  {"\n"}
-                  {"  "}
-                  <span className="text-neutral-500">{"}"}</span>
-                  {"\n"}
-                  <span className="text-neutral-500">{"})"}</span>
-                  {"\n\n"}
-                  <span className="text-blue-400">const</span>{" "}
-                  <span className="text-neutral-300">instance</span>{" "}
-                  <span className="text-neutral-500">=</span>{" "}
-                  <span className="text-neutral-300">trafficLight</span>
-                  <span className="text-neutral-500">.</span>
-                  <span className="text-yellow-400">start</span>
-                  <span className="text-neutral-500">()</span>
-                  {"\n"}
-                  <span className="text-neutral-300">instance</span>
-                  <span className="text-neutral-500">.</span>
-                  <span className="text-yellow-400">send</span>
-                  <span className="text-neutral-500">(</span>
-                  <span className="text-green-400">&quot;TIMER&quot;</span>
-                  <span className="text-neutral-500">)</span>
-                  {"  "}
-                  <span className="text-neutral-600">{"// → green"}</span>
-                </code>
-              </pre>
-            </div>
+            <CodeBlock code={trafficLightExample} filename="traffic-light.ts" />
           </div>
         </section>
 

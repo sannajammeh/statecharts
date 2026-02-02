@@ -14,7 +14,8 @@
     "@statecharts/ui": "*",
     "next": "16.1.6",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "sugar-high": "^0.9.5"
   },
   "devDependencies": {
     "@statecharts/eslint-config": "*",

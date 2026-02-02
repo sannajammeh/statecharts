@@ -21,3 +21,16 @@
     color: var(--color-foreground);
   }
 }
+
+/* sugar-high syntax highlighting */
+:root {
+  --sh-class: #4ec9b0;
+  --sh-identifier: #d4d4d4;
+  --sh-sign: #737373;
+  --sh-property: #d4d4d4;
+  --sh-entity: #4fc1ff;
+  --sh-jsxliterals: #ce9178;
+  --sh-string: #86efac;
+  --sh-keyword: #60a5fa;
+  --sh-comment: #525252;
+}
