@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+:root {
+  --viz-bg: #ffffff;
+  --viz-text: #1f2937;
+  --viz-border: #e5e7eb;
+  --viz-node-bg: #ffffff;
+  --viz-node-active: #eff6ff;
+  --viz-node-border: #9ca3af;
+}
+
+.dark {
+  --viz-bg: #111827;
+  --viz-text: #f9fafb;
+  --viz-border: #374151;
+  --viz-node-bg: #1f2937;
+  --viz-node-active: #1e3a5f;
+  --viz-node-border: #4b5563;
+}
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+}
+
+.react-flow__node {
+  font-size: 12px;
+}
+
+.react-flow__edge-path {
+  stroke: #6b7280;
+  stroke-width: 2;
+}
+
+.react-flow__edge.animated .react-flow__edge-path {
+  stroke-dasharray: 5;
+  animation: dash 0.5s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
