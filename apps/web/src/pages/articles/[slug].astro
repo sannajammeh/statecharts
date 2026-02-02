@@ -4,7 +4,7 @@ import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog");
+  const posts = await getCollection("articles");
   return posts.map((post) => ({
     params: { slug: post.slug },
     props: { post },
@@ -12,7 +12,7 @@ export async function getStaticPaths() {
 }
 
 interface Props {
-  post: CollectionEntry<"blog">;
+  post: CollectionEntry<"articles">;
 }
 
 const { post } = Astro.props;
@@ -23,7 +23,14 @@ function formatDate(date: Date): string {
 }
 ---
 
-<BaseLayout title={`${post.data.title} - Statecharts.sh`} description={post.data.description}>
+<BaseLayout
+  title={`${post.data.title} - Statecharts.sh`}
+  description={post.data.description}
+  article={{
+    publishedTime: post.data.date.toISOString(),
+    author: post.data.author,
+  }}
+>
   <main class="mx-auto max-w-2xl px-4 py-16">
     <article>
       <header class="mb-8">

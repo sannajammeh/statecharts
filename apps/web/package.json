@@ -14,7 +14,7 @@
     "@astrojs/mdx": "^4.3.13",
     "@astrojs/react": "^4.4.2",
     "@astrojs/rss": "^4.0.15",
-    "@statecharts/core": "*",
+    "statecharts": "*",
     "astro": "^5.17.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

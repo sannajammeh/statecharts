@@ -5,7 +5,7 @@ import { StateExampleTabs } from "../components/StateExampleTabs";
 import { CodeBlock } from "../components/CodeBlock";
 import { FAQItem } from "../components/FAQItem";
 
-const trafficLightExample = `import { chart } from "@statecharts/core"
+const trafficLightExample = `import { chart } from "statecharts"
 
 const trafficLight = chart({
   context: {},
@@ -21,11 +21,19 @@ const instance = trafficLight.start()
 instance.send("TIMER")  // → green`;
 ---
 
-<BaseLayout>
+<BaseLayout ogType="website">
   <div class="min-h-screen bg-neutral-950 text-neutral-100 font-mono">
     <div class="mx-auto max-w-4xl px-6 py-12">
       <!-- Header -->
-      <h1 class="text-sm font-bold uppercase tracking-widest">Statecharts.sh</h1>
+      <div class="flex items-center justify-between">
+        <h1 class="text-sm font-bold uppercase tracking-widest">Statecharts.sh</h1>
+        <a
+          href="/articles"
+          class="text-xs uppercase tracking-wide text-neutral-400 hover:text-neutral-200 transition-colors"
+        >
+          Articles
+        </a>
+      </div>
 
       <!-- Hero Section -->
       <div class="mt-8 border border-neutral-800 p-8">
@@ -153,7 +161,7 @@ instance.send("TIMER")  // → green`;
 
       <!-- Footer -->
       <footer class="mt-16 flex items-center justify-between border-t border-neutral-800 pt-8 text-xs text-neutral-500">
-        <span>© 2025 Statecharts.sh</span>
+        <span>© 2025 <a href="https://skala.sh" class="hover:text-neutral-300 transition-colors">Skala Org</a></span>
         <div class="flex gap-6">
           <a
             href="https://github.com/statecharts/statecharts"

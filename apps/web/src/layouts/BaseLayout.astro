@@ -2,9 +2,55 @@
 interface Props {
   title?: string;
   description?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+  ogType?: "website" | "article";
+  article?: {
+    publishedTime: string;
+    author: string;
+  };
 }
 
-const { title = "Lorem Ipsum", description = "A lightweight spec-driven framework" } = Astro.props;
+const {
+  title = "Statecharts.sh",
+  description = "An open state chart specification and TypeScript library for building deterministic, framework-agnostic state machines.",
+  canonicalUrl,
+  ogImage,
+  ogType = "website",
+  article,
+} = Astro.props;
+
+const siteUrl = Astro.site?.toString().replace(/\/$/, "") ?? "https://statecharts.sh";
+const canonical = canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString();
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Statecharts.sh",
+  url: siteUrl,
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Statecharts.sh",
+  description,
+  url: siteUrl,
+};
+
+const articleSchema = article
+  ? {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: title,
+      datePublished: article.publishedTime,
+      author: {
+        "@type": "Person",
+        name: article.author,
+      },
+      publisher: organizationSchema,
+    }
+  : null;
 ---
 
 <!doctype html>
@@ -14,6 +60,34 @@ const { title = "Lorem Ipsum", description = "A lightweight spec-driven framewor
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <title>{title}</title>
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content={article ? "article" : ogType} />
+    <meta property="og:site_name" content="Statecharts.sh" />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    {article && <meta property="article:published_time" content={article.publishedTime} />}
+    {article && <meta property="article:author" content={article.author} />}
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+    {ogType === "website" && !article && (
+      <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+    )}
+    {articleSchema && (
+      <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+    )}
+
     <link rel="preload" href="/fonts/GeistVF.woff" as="font" type="font/woff" crossorigin />
     <link rel="preload" href="/fonts/GeistMonoVF.woff" as="font" type="font/woff" crossorigin />
   </head>

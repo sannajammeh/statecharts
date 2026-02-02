@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import schema from "@statecharts/core/schema.json";
+import schema from "statecharts/schema.json";
 
 export const GET: APIRoute = () => {
   return new Response(JSON.stringify(schema, null, 2), {

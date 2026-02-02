@@ -1,5 +1,5 @@
 {
-  "name": "@statecharts/core",
+  "name": "statecharts",
   "version": "0.0.0",
   "private": true,
   "type": "module",
