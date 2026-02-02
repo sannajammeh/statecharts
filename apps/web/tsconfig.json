@@ -1,19 +1,11 @@
 {
-  "extends": "@statecharts/typescript-config/nextjs.json",
+  "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
-    "plugins": [
-      {
-        "name": "next",
-      },
-    ],
-    "resolveJsonModule": true,
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "next-env.d.ts",
-    "next.config.ts",
-    ".next/types/**/*.ts",
-  ],
-  "exclude": ["node_modules"],
+  "include": ["src/**/*", "astro.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }

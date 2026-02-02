@@ -1,0 +1,168 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { InstallTabs } from "../components/InstallTabs";
+import { StateExampleTabs } from "../components/StateExampleTabs";
+import { CodeBlock } from "../components/CodeBlock";
+import { FAQItem } from "../components/FAQItem";
+
+const trafficLightExample = `import { chart } from "@statecharts/core"
+
+const trafficLight = chart({
+  context: {},
+  initial: "red",
+  states: {
+    red: { on: { TIMER: "green" } },
+    green: { on: { TIMER: "yellow" } },
+    yellow: { on: { TIMER: "red" } },
+  }
+})
+
+const instance = trafficLight.start()
+instance.send("TIMER")  // → green`;
+---
+
+<BaseLayout>
+  <div class="min-h-screen bg-neutral-950 text-neutral-100 font-mono">
+    <div class="mx-auto max-w-4xl px-6 py-12">
+      <!-- Header -->
+      <h1 class="text-sm font-bold uppercase tracking-widest">Statecharts.sh</h1>
+
+      <!-- Hero Section -->
+      <div class="mt-8 border border-neutral-800 p-8">
+        <p class="text-center text-sm uppercase tracking-wide">
+          An open state chart specification and library
+        </p>
+
+        <!-- Feature Badges -->
+        <div class="mt-8 grid grid-cols-3 gap-4 text-center text-xs uppercase tracking-wide">
+          <div class="border border-neutral-800 py-3">Deterministic</div>
+          <div class="border border-neutral-800 py-3">Framework Agnostic</div>
+          <div class="border border-neutral-800 py-3">TypeScript-first</div>
+        </div>
+
+        <!-- Install Commands -->
+        <InstallTabs client:load />
+
+        <!-- Links -->
+        <div class="mt-4 flex items-center justify-between border border-neutral-800 px-4 py-3">
+          <span class="text-xs uppercase tracking-wide">GitHub</span>
+          <a
+            href="https://github.com/statecharts/statecharts"
+            class="flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200"
+          >
+            https://github.com/statecharts/statecharts <span>→</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- What are Statecharts? -->
+      <section class="mt-12">
+        <h2 class="text-xs font-bold uppercase tracking-widest">What are Statecharts?</h2>
+        <div class="mt-4 border border-neutral-800 p-6">
+          <p class="text-sm text-neutral-400">
+            Statecharts are a formal way to describe the behavior of reactive systems. They extend
+            finite state machines with hierarchy, concurrency, and communication—making complex UI
+            logic predictable and visualizable.
+          </p>
+          <p class="mt-4 text-sm text-neutral-400">
+            Define your states, transitions, and actions declaratively. The statechart handles the
+            rest: which transitions are valid, what state you're in, and what happens next.
+          </p>
+          <StateExampleTabs client:load />
+        </div>
+      </section>
+
+      <!-- Statecharts Library -->
+      <section class="mt-12">
+        <h2 class="text-xs font-bold uppercase tracking-widest">Statecharts Library</h2>
+        <div class="mt-4 border border-neutral-800 p-6">
+          <p class="text-sm text-neutral-400">
+            A TypeScript-first library for building statecharts. Define states, transitions, and
+            context declaratively.
+          </p>
+          <CodeBlock code={trafficLightExample} filename="traffic-light.ts" client:load />
+        </div>
+      </section>
+
+      <!-- Open Standard -->
+      <section class="mt-12">
+        <h2 class="text-xs font-bold uppercase tracking-widest">Open Standard</h2>
+        <div class="mt-4 border border-neutral-800 p-6">
+          <p class="text-sm text-neutral-400">
+            Statecharts.sh defines a JSON Schema for statechart exports, enabling validation,
+            editor autocomplete, and interoperability between tools.
+          </p>
+          <p class="mt-4 text-sm text-neutral-400">
+            Use the schema to validate your statechart definitions, generate documentation, or
+            build custom tooling around the standard format.
+          </p>
+          <div class="mt-6 flex items-center justify-between border border-neutral-800 px-4 py-3">
+            <span class="text-xs uppercase tracking-wide">JSON Schema</span>
+            <a
+              href="/schema.json"
+              class="flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200"
+            >
+              /schema.json <span>→</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Visualizer Coming Soon -->
+      <section class="mt-12">
+        <h2 class="text-xs font-bold uppercase tracking-widest">Visualizer</h2>
+        <div class="mt-4 border border-neutral-800 p-6">
+          <div class="flex items-center justify-between">
+            <h3 class="font-medium uppercase tracking-wide">State Visualizer</h3>
+            <span class="border border-amber-700 bg-amber-950/50 px-2 py-1 text-xs uppercase text-amber-400">
+              Coming Soon
+            </span>
+          </div>
+          <p class="mt-4 text-sm text-neutral-400">
+            Visualize your statecharts as interactive diagrams. See states, transitions, and the
+            current state of your machine in real-time as your application runs.
+          </p>
+          <p class="mt-4 text-sm text-neutral-400">
+            Debug complex state logic visually. Step through transitions, inspect context, and
+            understand exactly how your machine behaves.
+          </p>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="mt-12">
+        <h2 class="text-xs font-bold uppercase tracking-widest">Frequently Asked Questions</h2>
+        <div class="mt-4 border border-neutral-800 p-6">
+          <FAQItem
+            client:load
+            question="What are statecharts?"
+            answer="Statecharts are an extension of finite state machines that add hierarchy (nested states), concurrency (parallel states), and history (remembering previous states). They were invented by David Harel in 1987 to model complex reactive systems in a visual and formal way."
+          />
+          <FAQItem
+            client:load
+            question="How is this different from Redux?"
+            answer="Redux is a general-purpose state container that doesn't enforce any structure on state transitions. Statecharts explicitly model which transitions are possible from each state, making impossible states impossible. This prevents bugs like triggering actions that don't make sense in the current state."
+          />
+          <FAQItem
+            client:load
+            question="How is this different from XState?"
+            answer="XState is a great statechart library. Statecharts.sh aims to provide a simpler, lighter-weight alternative focused on the core statechart specification. It's designed to be framework-agnostic and TypeScript-first with minimal dependencies."
+          />
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="mt-16 flex items-center justify-between border-t border-neutral-800 pt-8 text-xs text-neutral-500">
+        <span>© 2025 Statecharts.sh</span>
+        <div class="flex gap-6">
+          <a
+            href="https://github.com/statecharts/statecharts"
+            class="hover:text-neutral-300 transition-colors"
+          >
+            GITHUB
+          </a>
+        </div>
+      </footer>
+    </div>
+  </div>
+</BaseLayout>
