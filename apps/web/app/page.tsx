@@ -129,11 +129,22 @@ export default function Home() {
               </div>
               <pre className="overflow-x-auto p-3 text-xs leading-relaxed">
                 <code>
+                  <span className="text-blue-400">import</span>
+                  <span className="text-neutral-500">{" { "}</span>
+                  <span className="text-neutral-300">chart</span>
+                  <span className="text-neutral-500">{" } "}</span>
+                  <span className="text-blue-400">from</span>{" "}
+                  <span className="text-green-400">&quot;@statecharts/core&quot;</span>
+                  {"\n\n"}
                   <span className="text-blue-400">const</span>{" "}
                   <span className="text-neutral-300">trafficLight</span>{" "}
                   <span className="text-neutral-500">=</span>{" "}
-                  <span className="text-yellow-400">createMachine</span>
+                  <span className="text-yellow-400">chart</span>
                   <span className="text-neutral-500">{"({"}</span>
+                  {"\n"}
+                  {"  "}
+                  <span className="text-neutral-300">context</span>
+                  <span className="text-neutral-500">: {"{}"},</span>
                   {"\n"}
                   {"  "}
                   <span className="text-neutral-300">initial</span>
@@ -179,6 +190,23 @@ export default function Home() {
                   <span className="text-neutral-500">{"}"}</span>
                   {"\n"}
                   <span className="text-neutral-500">{"})"}</span>
+                  {"\n\n"}
+                  <span className="text-blue-400">const</span>{" "}
+                  <span className="text-neutral-300">instance</span>{" "}
+                  <span className="text-neutral-500">=</span>{" "}
+                  <span className="text-neutral-300">trafficLight</span>
+                  <span className="text-neutral-500">.</span>
+                  <span className="text-yellow-400">start</span>
+                  <span className="text-neutral-500">()</span>
+                  {"\n"}
+                  <span className="text-neutral-300">instance</span>
+                  <span className="text-neutral-500">.</span>
+                  <span className="text-yellow-400">send</span>
+                  <span className="text-neutral-500">(</span>
+                  <span className="text-green-400">&quot;TIMER&quot;</span>
+                  <span className="text-neutral-500">)</span>
+                  {"  "}
+                  <span className="text-neutral-600">{"// → green"}</span>
                 </code>
               </pre>
             </div>
