@@ -1,5 +1,4 @@
 import { defineConfig } from 'rolldown';
-import { isolatedDeclaration } from 'unplugin-isolated-decl/rolldown';
 
 export default defineConfig({
   input: 'src/index.ts',
@@ -7,5 +6,4 @@ export default defineConfig({
     dir: 'dist',
     format: 'esm',
   },
-  plugins: [isolatedDeclaration()],
 });
