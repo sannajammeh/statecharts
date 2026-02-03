@@ -2,10 +2,10 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { InstallTabs } from "../components/InstallTabs";
 import { StateExampleTabs } from "../components/StateExampleTabs";
-import { CodeBlock } from "../components/CodeBlock";
+import { CodeTabs } from "../components/CodeTabs";
 import { FAQItem } from "../components/FAQItem";
 
-const trafficLightExample = `import { chart } from "statecharts.sh"
+const trafficLightCoreExample = `import { chart } from "statecharts.sh"
 
 const trafficLight = chart({
   context: {},
@@ -19,6 +19,29 @@ const trafficLight = chart({
 
 const instance = trafficLight.start()
 instance.send("TIMER")  // → green`;
+
+const trafficLightReactExample = `import { chart } from "statecharts.sh"
+import { useStateChart } from "@statecharts/react"
+
+const trafficLight = chart({
+  context: {},
+  initial: "red",
+  states: {
+    red: { on: { TIMER: "green" } },
+    green: { on: { TIMER: "yellow" } },
+    yellow: { on: { TIMER: "red" } },
+  }
+})
+
+function TrafficLight() {
+  const { state, send } = useStateChart(trafficLight)
+
+  return (
+    <button onClick={() => send("TIMER")}>
+      {state.value}
+    </button>
+  )
+}`;
 ---
 
 <BaseLayout ogType="website">
@@ -97,9 +120,15 @@ instance.send("TIMER")  // → green`;
         <div class="mt-4 border border-neutral-800 p-6">
           <p class="text-sm text-neutral-400">
             A TypeScript-first library for building statecharts. Define states, transitions, and
-            context declaratively.
+            context declaratively. Use the core library standalone or with React bindings.
           </p>
-          <CodeBlock code={trafficLightExample} filename="traffic-light.ts" client:load />
+          <CodeTabs
+            coreCode={trafficLightCoreExample}
+            reactCode={trafficLightReactExample}
+            coreFilename="traffic-light.ts"
+            reactFilename="TrafficLight.tsx"
+            client:load
+          />
         </div>
       </section>
 

@@ -33,6 +33,14 @@ export default defineConfig({
           ],
         },
         {
+          label: "React",
+          items: [
+            { label: "Quick Start", slug: "docs/react" },
+            { label: "Hook API", slug: "docs/react/hook-api" },
+            { label: "Patterns", slug: "docs/react/patterns" },
+          ],
+        },
+        {
           label: "API Reference",
           autogenerate: { directory: "docs/api" },
         },

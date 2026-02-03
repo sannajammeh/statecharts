@@ -1,0 +1,258 @@
+---
+title: Patterns
+description: Common patterns for using statecharts in React.
+---
+
+## Conditional Rendering
+
+Use `matches()` to conditionally render based on state:
+
+```tsx
+function AuthStatus() {
+  const { state, send, matches } = useStateChart(authChart);
+
+  if (matches("loading")) {
+    return <Spinner />;
+  }
+
+  if (matches("authenticated")) {
+    return (
+      <div>
+        <span>Welcome, {state.context.user.name}</span>
+        <button onClick={() => send("LOGOUT")}>Logout</button>
+      </div>
+    );
+  }
+
+  if (matches("error")) {
+    return (
+      <div>
+        <p>Error: {state.context.error}</p>
+        <button onClick={() => send("RETRY")}>Retry</button>
+      </div>
+    );
+  }
+
+  return <button onClick={() => send("LOGIN")}>Login</button>;
+}
+```
+
+## Using state.value
+
+Access the raw state value for switch statements or comparisons:
+
+```tsx
+function TrafficLight() {
+  const { state, send } = useStateChart(trafficLightChart);
+
+  const colors = {
+    red: "#ef4444",
+    yellow: "#eab308",
+    green: "#22c55e",
+  };
+
+  return (
+    <div
+      style={{ backgroundColor: colors[state.value] }}
+      onClick={() => send("TIMER")}
+    >
+      {state.value.toUpperCase()}
+    </div>
+  );
+}
+```
+
+## Form State Machine
+
+Handle form states cleanly:
+
+```tsx
+const formChart = chart({
+  context: { data: null, error: null },
+  initial: "idle",
+  states: {
+    idle: {
+      on: { SUBMIT: "submitting" },
+    },
+    submitting: {
+      on: {
+        SUCCESS: {
+          target: "success",
+          actions: (_, event) => ({ data: event.data, error: null }),
+        },
+        ERROR: {
+          target: "error",
+          actions: (_, event) => ({ error: event.error, data: null }),
+        },
+      },
+    },
+    success: {
+      on: { RESET: "idle" },
+    },
+    error: {
+      on: {
+        RETRY: "submitting",
+        RESET: "idle",
+      },
+    },
+  },
+});
+
+function ContactForm() {
+  const { state, send, matches } = useStateChart(formChart);
+
+  const handleSubmit = async (formData) => {
+    send("SUBMIT");
+    try {
+      const result = await submitForm(formData);
+      send({ type: "SUCCESS", data: result });
+    } catch (err) {
+      send({ type: "ERROR", error: err.message });
+    }
+  };
+
+  if (matches("success")) {
+    return (
+      <div>
+        <p>Form submitted successfully!</p>
+        <button onClick={() => send("RESET")}>Submit another</button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input name="email" disabled={matches("submitting")} />
+
+      {matches("error") && (
+        <p className="error">{state.context.error}</p>
+      )}
+
+      <button type="submit" disabled={matches("submitting")}>
+        {matches("submitting") ? "Submitting..." : "Submit"}
+      </button>
+    </form>
+  );
+}
+```
+
+## Multi-Step Wizard
+
+```tsx
+const wizardChart = chart({
+  context: { step1Data: null, step2Data: null },
+  initial: "step1",
+  states: {
+    step1: {
+      on: {
+        NEXT: {
+          target: "step2",
+          actions: (_, event) => ({ step1Data: event.data }),
+        },
+      },
+    },
+    step2: {
+      on: {
+        BACK: "step1",
+        NEXT: {
+          target: "step3",
+          actions: (ctx, event) => ({ ...ctx, step2Data: event.data }),
+        },
+      },
+    },
+    step3: {
+      on: {
+        BACK: "step2",
+        SUBMIT: "complete",
+      },
+    },
+    complete: {},
+  },
+});
+
+function Wizard() {
+  const { state, send, matches } = useStateChart(wizardChart);
+
+  return (
+    <div>
+      {matches("step1") && (
+        <Step1 onNext={(data) => send({ type: "NEXT", data })} />
+      )}
+
+      {matches("step2") && (
+        <Step2
+          onBack={() => send("BACK")}
+          onNext={(data) => send({ type: "NEXT", data })}
+        />
+      )}
+
+      {matches("step3") && (
+        <Step3
+          data={state.context}
+          onBack={() => send("BACK")}
+          onSubmit={() => send("SUBMIT")}
+        />
+      )}
+
+      {matches("complete") && <SuccessMessage />}
+    </div>
+  );
+}
+```
+
+## Disabled States
+
+Disable UI elements based on state:
+
+```tsx
+function Player() {
+  const { state, send, matches } = useStateChart(playerChart);
+
+  return (
+    <div>
+      <button
+        onClick={() => send("PLAY")}
+        disabled={matches("playing") || matches("loading")}
+      >
+        Play
+      </button>
+
+      <button
+        onClick={() => send("PAUSE")}
+        disabled={!matches("playing")}
+      >
+        Pause
+      </button>
+
+      <button
+        onClick={() => send("STOP")}
+        disabled={matches("stopped")}
+      >
+        Stop
+      </button>
+    </div>
+  );
+}
+```
+
+## CSS Classes from State
+
+Map state to CSS classes:
+
+```tsx
+function Modal() {
+  const { state, send, matches } = useStateChart(modalChart);
+
+  return (
+    <div className={`modal modal--${state.value}`}>
+      {/* modal--open, modal--closing, modal--closed */}
+
+      {!matches("closed") && (
+        <div className="modal-content">
+          <button onClick={() => send("CLOSE")}>Close</button>
+        </div>
+      )}
+    </div>
+  );
+}
+```

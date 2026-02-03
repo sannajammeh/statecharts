@@ -42,6 +42,41 @@ const instance = trafficLight.start()
 instance.send("TIMER")  // → green
 ```
 
+## React
+
+Install the React bindings:
+
+```bash
+npm install @statecharts/react
+```
+
+Use the `useStateChart` hook:
+
+```tsx
+import { chart } from "statecharts.sh"
+import { useStateChart } from "@statecharts/react"
+
+const trafficLight = chart({
+  context: {},
+  initial: "red",
+  states: {
+    red: { on: { TIMER: "green" } },
+    green: { on: { TIMER: "yellow" } },
+    yellow: { on: { TIMER: "red" } },
+  }
+})
+
+function TrafficLight() {
+  const { state, send } = useStateChart(trafficLight)
+
+  return (
+    <button onClick={() => send("TIMER")}>
+      {state.value}
+    </button>
+  )
+}
+```
+
 ## Open Standard
 
 Statecharts.sh defines a JSON Schema for statechart exports, enabling validation, editor autocomplete, and interoperability between tools.
