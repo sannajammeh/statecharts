@@ -1,0 +1,161 @@
+---
+title: Traffic Light
+description: A classic state machine example with timed transitions.
+---
+
+The traffic light is a classic state machine example. It demonstrates:
+- Simple state transitions
+- Delayed (timed) transitions with `after`
+
+## Basic Implementation
+
+```typescript
+import { chart } from "statecharts.sh";
+
+const trafficLight = chart({
+  context: {},
+  initial: "red",
+  states: {
+    red: {
+      after: {
+        3000: "green", // After 3 seconds, go to green
+      },
+    },
+    green: {
+      after: {
+        2000: "yellow", // After 2 seconds, go to yellow
+      },
+    },
+    yellow: {
+      after: {
+        1000: "red", // After 1 second, go to red
+      },
+    },
+  },
+});
+```
+
+## Manual Control
+
+You can also use events for manual control:
+
+```typescript
+const trafficLight = chart({
+  context: {},
+  initial: "red",
+  states: {
+    red: {
+      on: { NEXT: "green" },
+    },
+    green: {
+      on: { NEXT: "yellow" },
+    },
+    yellow: {
+      on: { NEXT: "red" },
+    },
+  },
+});
+
+const instance = trafficLight.start();
+
+instance.subscribe((state) => {
+  console.log("Light is now:", state.value);
+});
+
+instance.send("NEXT"); // green
+instance.send("NEXT"); // yellow
+instance.send("NEXT"); // red
+```
+
+## With Pedestrian Crossing
+
+A more complex version with a pedestrian button:
+
+```typescript
+const trafficLight = chart({
+  context: {
+    pedestrianWaiting: false,
+  },
+  initial: "green",
+  states: {
+    green: {
+      on: {
+        TIMER: [
+          {
+            target: "yellow",
+            guard: (ctx) => ctx.pedestrianWaiting,
+          },
+          { target: "green" }, // Stay green if no pedestrian
+        ],
+        PEDESTRIAN_BUTTON: {
+          action: () => ({ pedestrianWaiting: true }),
+        },
+      },
+    },
+    yellow: {
+      after: {
+        1000: "red",
+      },
+    },
+    red: {
+      entry: () => ({ pedestrianWaiting: false }),
+      after: {
+        5000: "green",
+      },
+    },
+  },
+});
+```
+
+## React Component
+
+```tsx
+import { useState, useEffect } from "react";
+import { chart } from "statecharts.sh";
+
+const trafficLightMachine = chart({
+  context: {},
+  initial: "red",
+  states: {
+    red: { after: { 3000: "green" } },
+    green: { after: { 2000: "yellow" } },
+    yellow: { after: { 1000: "red" } },
+  },
+});
+
+function TrafficLight() {
+  const [state, setState] = useState(() =>
+    trafficLightMachine.start().state
+  );
+
+  useEffect(() => {
+    const instance = trafficLightMachine.start();
+    const unsub = instance.subscribe(setState);
+    return () => {
+      unsub();
+      instance.stop();
+    };
+  }, []);
+
+  const colors = {
+    red: "bg-red-500",
+    yellow: "bg-yellow-500",
+    green: "bg-green-500",
+  };
+
+  return (
+    <div className="flex flex-col gap-2 p-4 bg-gray-800 rounded-lg w-20">
+      {["red", "yellow", "green"].map((color) => (
+        <div
+          key={color}
+          className={`w-12 h-12 rounded-full ${
+            state.value === color
+              ? colors[color]
+              : "bg-gray-600"
+          }`}
+        />
+      ))}
+    </div>
+  );
+}
+```

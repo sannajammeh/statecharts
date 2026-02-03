@@ -1,0 +1,98 @@
+---
+title: Getting Started
+description: Install statecharts.sh and create your first statechart.
+---
+
+## Installation
+
+Install the package using your preferred package manager:
+
+```bash
+npm install statecharts.sh
+```
+
+```bash
+pnpm add statecharts.sh
+```
+
+```bash
+bun add statecharts.sh
+```
+
+## Your First Statechart
+
+Create a simple toggle statechart:
+
+```typescript
+import { chart } from "statecharts.sh";
+
+const toggle = chart({
+  context: {},
+  initial: "inactive",
+  states: {
+    inactive: {
+      on: { TOGGLE: "active" },
+    },
+    active: {
+      on: { TOGGLE: "inactive" },
+    },
+  },
+});
+```
+
+## Starting an Instance
+
+A chart is a blueprint. To run it, create an instance:
+
+```typescript
+const instance = toggle.start();
+
+console.log(instance.state.value); // "inactive"
+
+instance.send("TOGGLE");
+console.log(instance.state.value); // "active"
+```
+
+## Subscribing to State Changes
+
+React to state transitions:
+
+```typescript
+instance.subscribe((state) => {
+  console.log("Current state:", state.value);
+});
+
+instance.send("TOGGLE"); // logs: "Current state: inactive"
+```
+
+## Using Context
+
+Store data alongside state:
+
+```typescript
+const counter = chart({
+  context: { count: 0 },
+  initial: "idle",
+  states: {
+    idle: {
+      on: {
+        INCREMENT: {
+          actions: (ctx) => ({ count: ctx.count + 1 }),
+        },
+        DECREMENT: {
+          actions: (ctx) => ({ count: ctx.count - 1 }),
+        },
+      },
+    },
+  },
+});
+
+const instance = counter.start();
+instance.send("INCREMENT");
+console.log(instance.state.context.count); // 1
+```
+
+## Next Steps
+
+- Explore the [API Reference](/docs/api/chart) for full documentation
+- See [Examples](/docs/examples/traffic-light) for real-world patterns

@@ -1,0 +1,309 @@
+---
+title: Async Data Fetching
+description: Handle loading, success, and error states for async operations.
+---
+
+Statecharts excel at managing async data fetching with clear states for loading, success, and error conditions.
+
+## Basic Fetch Pattern
+
+```typescript
+import { chart } from "statecharts.sh";
+
+interface FetchContext<T> {
+  data: T | null;
+  error: string | null;
+}
+
+const fetchMachine = chart<FetchContext<User[]>>({
+  context: {
+    data: null,
+    error: null,
+  },
+  initial: "idle",
+  states: {
+    idle: {
+      on: { FETCH: "loading" },
+    },
+    loading: {
+      invoke: async () => {
+        const response = await fetch("/api/users");
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+      },
+      onDone: {
+        target: "success",
+        action: (ctx, event) => ({
+          data: event.data,
+          error: null,
+        }),
+      },
+      onError: {
+        target: "error",
+        action: (ctx, event) => ({
+          error: event.error.message,
+        }),
+      },
+    },
+    success: {
+      on: {
+        REFRESH: "loading",
+        RESET: {
+          target: "idle",
+          action: () => ({ data: null, error: null }),
+        },
+      },
+    },
+    error: {
+      on: {
+        RETRY: "loading",
+        RESET: {
+          target: "idle",
+          action: () => ({ data: null, error: null }),
+        },
+      },
+    },
+  },
+});
+```
+
+## With Pagination
+
+```typescript
+interface PaginatedContext<T> {
+  items: T[];
+  page: number;
+  hasMore: boolean;
+  loading: boolean;
+  error: string | null;
+}
+
+const paginatedFetch = chart<PaginatedContext<Item>>({
+  context: {
+    items: [],
+    page: 1,
+    hasMore: true,
+    loading: false,
+    error: null,
+  },
+  initial: "idle",
+  states: {
+    idle: {
+      on: {
+        LOAD_MORE: {
+          target: "loading",
+          guard: (ctx) => ctx.hasMore,
+        },
+      },
+    },
+    loading: {
+      entry: () => ({ loading: true }),
+      exit: () => ({ loading: false }),
+      invoke: async (ctx) => {
+        const response = await fetch(`/api/items?page=${ctx.page}`);
+        return response.json();
+      },
+      onDone: {
+        target: "idle",
+        action: (ctx, event) => ({
+          items: [...ctx.items, ...event.data.items],
+          page: ctx.page + 1,
+          hasMore: event.data.hasMore,
+        }),
+      },
+      onError: {
+        target: "error",
+        action: (ctx, event) => ({
+          error: event.error.message,
+        }),
+      },
+    },
+    error: {
+      on: {
+        RETRY: "loading",
+      },
+    },
+  },
+});
+```
+
+## With Caching
+
+```typescript
+interface CachedContext<T> {
+  cache: Map<string, { data: T; timestamp: number }>;
+  currentKey: string | null;
+  data: T | null;
+  error: string | null;
+}
+
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+const cachedFetch = chart<CachedContext<any>>({
+  context: {
+    cache: new Map(),
+    currentKey: null,
+    data: null,
+    error: null,
+  },
+  initial: "idle",
+  states: {
+    idle: {
+      on: {
+        FETCH: [
+          {
+            target: "cached",
+            guard: (ctx, event) => {
+              const cached = ctx.cache.get(event.key);
+              return cached && Date.now() - cached.timestamp < CACHE_TTL;
+            },
+            action: (ctx, event) => ({
+              currentKey: event.key,
+              data: ctx.cache.get(event.key)?.data,
+            }),
+          },
+          {
+            target: "loading",
+            action: (ctx, event) => ({ currentKey: event.key }),
+          },
+        ],
+      },
+    },
+    loading: {
+      invoke: async (ctx) => {
+        const response = await fetch(`/api/data/${ctx.currentKey}`);
+        return response.json();
+      },
+      onDone: {
+        target: "success",
+        action: (ctx, event) => {
+          const newCache = new Map(ctx.cache);
+          newCache.set(ctx.currentKey!, {
+            data: event.data,
+            timestamp: Date.now(),
+          });
+          return {
+            cache: newCache,
+            data: event.data,
+            error: null,
+          };
+        },
+      },
+      onError: {
+        target: "error",
+        action: (ctx, event) => ({
+          error: event.error.message,
+        }),
+      },
+    },
+    cached: {
+      on: {
+        FETCH: "idle", // Re-evaluate cache
+        INVALIDATE: {
+          target: "loading",
+          action: (ctx) => {
+            const newCache = new Map(ctx.cache);
+            newCache.delete(ctx.currentKey!);
+            return { cache: newCache };
+          },
+        },
+      },
+    },
+    success: {
+      on: {
+        FETCH: "idle",
+        REFRESH: "loading",
+      },
+    },
+    error: {
+      on: {
+        RETRY: "loading",
+        FETCH: "idle",
+      },
+    },
+  },
+});
+```
+
+## React Hook
+
+```typescript
+import { useState, useEffect, useMemo } from "react";
+
+function useFetch<T>(url: string) {
+  const machine = useMemo(
+    () =>
+      chart<FetchContext<T>>({
+        context: { data: null, error: null },
+        initial: "idle",
+        states: {
+          idle: { on: { FETCH: "loading" } },
+          loading: {
+            invoke: async () => {
+              const res = await fetch(url);
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              return res.json();
+            },
+            onDone: {
+              target: "success",
+              action: (_, e) => ({ data: e.data, error: null }),
+            },
+            onError: {
+              target: "error",
+              action: (_, e) => ({ error: e.error.message }),
+            },
+          },
+          success: { on: { REFRESH: "loading" } },
+          error: { on: { RETRY: "loading" } },
+        },
+      }),
+    [url]
+  );
+
+  const [instance] = useState(() => machine.start());
+  const [state, setState] = useState(instance.state);
+
+  useEffect(() => {
+    const unsub = instance.subscribe(setState);
+    instance.send("FETCH"); // Auto-fetch on mount
+    return () => {
+      unsub();
+      instance.stop();
+    };
+  }, [instance]);
+
+  return {
+    data: state.context.data,
+    error: state.context.error,
+    isLoading: state.matches("loading"),
+    isError: state.matches("error"),
+    refetch: () => instance.send("REFRESH"),
+    retry: () => instance.send("RETRY"),
+  };
+}
+```
+
+## Usage
+
+```tsx
+function UserList() {
+  const { data, error, isLoading, isError, refetch, retry } =
+    useFetch<User[]>("/api/users");
+
+  if (isLoading) return <Spinner />;
+  if (isError) return <ErrorMessage error={error} onRetry={retry} />;
+
+  return (
+    <div>
+      <button onClick={refetch}>Refresh</button>
+      <ul>
+        {data?.map((user) => (
+          <li key={user.id}>{user.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
