@@ -1,0 +1,37 @@
+---
+title: Statecharts.sh Documentation
+description: Learn how to use statecharts.sh to build deterministic, framework-agnostic state machines.
+---
+
+Welcome to the **statecharts.sh** documentation.
+
+Statecharts.sh is a TypeScript-first library for building statecharts — an extension of finite state machines with hierarchy, concurrency, and communication.
+
+## Quick Start
+
+```bash
+npm install statecharts.sh
+```
+
+```typescript
+import { chart } from "statecharts.sh";
+
+const trafficLight = chart({
+  context: {},
+  initial: "red",
+  states: {
+    red: { on: { TIMER: "green" } },
+    green: { on: { TIMER: "yellow" } },
+    yellow: { on: { TIMER: "red" } },
+  },
+});
+
+const instance = trafficLight.start();
+instance.send("TIMER"); // → green
+```
+
+## Sections
+
+- **[Getting Started](/docs/getting-started)** — Installation and basic usage
+- **[API Reference](/docs/api/chart)** — Detailed API documentation
+- **[Examples](/docs/examples/traffic-light)** — Real-world patterns and recipes

@@ -4,13 +4,13 @@ Guidelines for agentic coding agents working in this repository.
 
 ## Stack Overview
 
-Turborepo monorepo with Next.js 16 + React 19, TypeScript (strict), Tailwind CSS v4, Biome + ESLint, Bun package manager.
+Turborepo monorepo with Astro + React 19, TypeScript (strict), Tailwind CSS v4, Biome + ESLint, Bun package manager.
 
 ## Project Structure
 
 ```
 apps/
-  web/                # Next.js app (App Router, port 3000)
+  web/                # Astro app (port 3000, docs site)
   visualizer/         # Vite-based visualizer app
 packages/
   core/               # Statechart library (statecharts.sh)
@@ -65,18 +65,15 @@ cd packages/ui && npm run generate:component
 ### Linting
 - **ESLint 9**: Flat config format
 - **Zero warnings**: `--max-warnings 0` enforced
-- **Plugins**: React, React Hooks, Next.js, TypeScript
+- **Plugins**: React, React Hooks, TypeScript
 - **Tailwind**: `useSortedClasses` rule for class ordering
 
 ### React Components
-- **Directive**: Use `"use client"` for client components
 - **Pattern**: Functional components with destructured props
 - **Props**: Explicit interfaces, no inline types
 - **Imports**: React hooks from `react`, types with `import type`
 
 ```typescript
-"use client";
-
 import { useState, ReactNode } from "react";
 import type { Metadata } from "next";
 
@@ -86,9 +83,9 @@ interface ButtonProps {
   appName: string;
 }
 
-export const Button = ({ children, className = "", appName }: ButtonProps) => {
+export function Button({ children, className = "", appName }: ButtonProps) {
   return <button className={className}>{children}</button>;
-};
+}
 ```
 
 ### Naming Conventions
@@ -99,7 +96,7 @@ export const Button = ({ children, className = "", appName }: ButtonProps) => {
 - **Files**: camelCase for utilities, PascalCase for components
 
 ### Imports
-- **Order**: React → Next.js → External libs → Internal packages → Local
+- **Order**: React → External libs → Internal packages → Local
 - **Type imports**: Use `import type { Foo } from "bar"`
 - **Internal packages**: Use `@statecharts/` prefix (e.g., `@statecharts/ui`), except `statecharts.sh` (core)
 - **File extensions**: Include `.js` for imports in core package

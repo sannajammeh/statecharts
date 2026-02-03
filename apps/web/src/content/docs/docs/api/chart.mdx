@@ -1,0 +1,152 @@
+---
+title: chart()
+description: Create a statechart definition.
+---
+
+The `chart()` function creates a statechart from a definition object.
+
+## Signature
+
+```typescript
+function chart<TContext, TEvent>(
+  definition: ChartDefinition<TContext, TEvent>
+): Chart<TContext, TEvent>
+```
+
+## Parameters
+
+### `definition`
+
+The chart definition object with these properties:
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | `string` | No | Identifier for the chart |
+| `context` | `TContext` | Yes | Initial context data |
+| `initial` | `string` | Yes | Initial state name |
+| `states` | `Record<string, StateNode>` | Yes | State definitions |
+
+## Return Value
+
+Returns a `Chart` object with:
+
+| Property/Method | Type | Description |
+|-----------------|------|-------------|
+| `definition` | `ChartDefinition` | The chart definition |
+| `start(initialContext?)` | `ChartInstance` | Create a running instance |
+| `export()` | `SCJSONDocument` | Export to SCJSON format |
+
+## StateNode
+
+Each state in `states` can have:
+
+```typescript
+interface StateNode<TContext, TEvent> {
+  entry?: Actions;           // Run when entering state
+  exit?: Actions;            // Run when exiting state
+  on?: Record<string, Transition>;  // Event handlers
+  after?: Record<number, Transition>; // Delayed transitions (ms)
+  invoke?: InvokeFn;         // Async invocation
+  onDone?: Transition;       // Handle invoke success
+  onError?: Transition;      // Handle invoke error
+  initial?: string;          // Initial child state
+  states?: Record<string, StateNode>; // Nested states
+  final?: boolean;           // Mark as final state
+}
+```
+
+## Transitions
+
+Transitions can be defined in several ways:
+
+```typescript
+// String shorthand - just target state
+on: { CLICK: "active" }
+
+// Object with target
+on: { CLICK: { target: "active" } }
+
+// With guard
+on: {
+  CLICK: {
+    target: "active",
+    guard: (ctx, event) => ctx.enabled,
+  }
+}
+
+// With action
+on: {
+  CLICK: {
+    target: "active",
+    action: (ctx, event) => ({ clicks: ctx.clicks + 1 }),
+  }
+}
+
+// Multiple transitions (evaluated in order)
+on: {
+  CLICK: [
+    { target: "disabled", guard: (ctx) => ctx.clicks >= 10 },
+    { target: "active" }
+  ]
+}
+```
+
+## Actions
+
+Actions receive context and event, and optionally return context updates:
+
+```typescript
+const machine = chart({
+  context: { count: 0 },
+  initial: "idle",
+  states: {
+    idle: {
+      entry: (ctx) => console.log("Entered idle"),
+      exit: (ctx) => console.log("Exiting idle"),
+      on: {
+        INCREMENT: {
+          action: (ctx, event) => ({ count: ctx.count + 1 }),
+        },
+      },
+    },
+  },
+});
+```
+
+## Example
+
+```typescript
+import { chart } from "statecharts.sh";
+
+const loginMachine = chart({
+  id: "login",
+  context: {
+    attempts: 0,
+    error: null as string | null,
+  },
+  initial: "idle",
+  states: {
+    idle: {
+      on: { SUBMIT: "loading" },
+    },
+    loading: {
+      invoke: async (ctx) => {
+        const response = await fetch("/api/login");
+        if (!response.ok) throw new Error("Failed");
+        return response.json();
+      },
+      onDone: { target: "success" },
+      onError: {
+        target: "idle",
+        action: (ctx, event) => ({
+          attempts: ctx.attempts + 1,
+          error: event.error.message,
+        }),
+      },
+    },
+    success: {
+      final: true,
+    },
+  },
+});
+```
