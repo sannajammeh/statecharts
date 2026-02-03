@@ -109,7 +109,7 @@ function exportStateNode<TContext extends AnyContext, TEvent extends BaseEvent>(
   return exported;
 }
 
-export function exportChart<TContext extends AnyContext, TEvent extends BaseEvent>(
+export function exportChartLegacy<TContext extends AnyContext, TEvent extends BaseEvent>(
   definition: ChartDefinition<TContext, TEvent>
 ): ExportedChart {
   const states: Record<string, ExportedStateNode> = {};

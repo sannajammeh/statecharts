@@ -6,8 +6,10 @@ import type {
   ChartInstance,
   ExportedChart,
 } from './types.js';
+import type { SCJSONDocument } from './scjson-types.js';
 import { createInstance } from './instance.js';
-import { exportChart } from './export.js';
+import { exportChartLegacy } from './export.js';
+import { exportSCJSON } from './scjson-export.js';
 
 export function chart<TContext extends AnyContext, TEvent extends BaseEvent = BaseEvent>(
   definition: ChartDefinition<TContext, TEvent>
@@ -21,8 +23,12 @@ export function chart<TContext extends AnyContext, TEvent extends BaseEvent = Ba
       return createInstance(definition, initialContext);
     },
 
-    export(): ExportedChart {
-      return exportChart(definition);
+    export(): SCJSONDocument {
+      return exportSCJSON(definition);
+    },
+
+    exportLegacy(): ExportedChart {
+      return exportChartLegacy(definition);
     },
   };
 }

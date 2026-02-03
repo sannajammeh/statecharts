@@ -1,0 +1,391 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://statecharts.sh/scjson/1.0.json",
+  "title": "SCJSON Schema",
+  "description": "JSON translation of W3C SCXML specification",
+  "type": "object",
+  "$ref": "#/$defs/scxml",
+  "$defs": {
+    "scxml": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "scxml" },
+        "version": { "const": "1.0" },
+        "name": { "type": "string" },
+        "initial": { "type": "string" },
+        "datamodel": { "enum": ["ecmascript"] },
+        "$schema": { "type": "string" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/scxmlChild" }
+        }
+      },
+      "required": ["$type", "version", "initial", "children"],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "state" },
+        "id": { "type": "string" },
+        "initial": { "type": "string" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/stateChild" }
+        }
+      },
+      "required": ["$type", "id"],
+      "additionalProperties": false
+    },
+    "parallel": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "parallel" },
+        "id": { "type": "string" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/stateChild" }
+        }
+      },
+      "required": ["$type", "id"],
+      "additionalProperties": false
+    },
+    "final": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "final" },
+        "id": { "type": "string" },
+        "children": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "$ref": "#/$defs/onentry" },
+              { "$ref": "#/$defs/onexit" },
+              { "$ref": "#/$defs/donedata" }
+            ]
+          }
+        }
+      },
+      "required": ["$type", "id"],
+      "additionalProperties": false
+    },
+    "history": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "history" },
+        "id": { "type": "string" },
+        "type": { "enum": ["shallow", "deep"] },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/transition" }
+        }
+      },
+      "required": ["$type", "id"],
+      "additionalProperties": false
+    },
+    "initial": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "initial" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/transition" }
+        }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "transition": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "transition" },
+        "event": { "type": "string" },
+        "cond": { "type": "string" },
+        "target": { "type": "string" },
+        "type": { "enum": ["internal", "external"] },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/executableContent" }
+        }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "onentry": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "onentry" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/executableContent" }
+        }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "onexit": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "onexit" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/executableContent" }
+        }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "datamodel": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "datamodel" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/data" }
+        }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "data" },
+        "id": { "type": "string" },
+        "expr": { "type": "string" }
+      },
+      "required": ["$type", "id"],
+      "additionalProperties": false
+    },
+    "assign": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "assign" },
+        "location": { "type": "string" },
+        "expr": { "type": "string" }
+      },
+      "required": ["$type", "location", "expr"],
+      "additionalProperties": false
+    },
+    "script": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "script" },
+        "$text": { "type": "string" }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "raise": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "raise" },
+        "event": { "type": "string" }
+      },
+      "required": ["$type", "event"],
+      "additionalProperties": false
+    },
+    "send": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "send" },
+        "event": { "type": "string" },
+        "eventexpr": { "type": "string" },
+        "target": { "type": "string" },
+        "targetexpr": { "type": "string" },
+        "delay": { "type": "string" },
+        "delayexpr": { "type": "string" },
+        "id": { "type": "string" },
+        "idlocation": { "type": "string" },
+        "type": { "type": "string" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/param" }
+        }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "cancel": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "cancel" },
+        "sendid": { "type": "string" },
+        "sendidexpr": { "type": "string" }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "log": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "log" },
+        "label": { "type": "string" },
+        "expr": { "type": "string" }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "if": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "if" },
+        "cond": { "type": "string" },
+        "children": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "$ref": "#/$defs/executableContent" },
+              { "$ref": "#/$defs/elseif" },
+              { "$ref": "#/$defs/else" }
+            ]
+          }
+        }
+      },
+      "required": ["$type", "cond"],
+      "additionalProperties": false
+    },
+    "elseif": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "elseif" },
+        "cond": { "type": "string" }
+      },
+      "required": ["$type", "cond"],
+      "additionalProperties": false
+    },
+    "else": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "else" }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "foreach": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "foreach" },
+        "array": { "type": "string" },
+        "item": { "type": "string" },
+        "index": { "type": "string" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/executableContent" }
+        }
+      },
+      "required": ["$type", "array", "item"],
+      "additionalProperties": false
+    },
+    "invoke": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "invoke" },
+        "id": { "type": "string" },
+        "idlocation": { "type": "string" },
+        "type": { "type": "string" },
+        "typeexpr": { "type": "string" },
+        "src": { "type": "string" },
+        "srcexpr": { "type": "string" },
+        "autoforward": { "type": "boolean" },
+        "children": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "$ref": "#/$defs/param" },
+              { "$ref": "#/$defs/content" },
+              { "$ref": "#/$defs/finalize" }
+            ]
+          }
+        }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "finalize": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "finalize" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/executableContent" }
+        }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "content": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "content" },
+        "expr": { "type": "string" },
+        "$text": { "type": "string" }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "param": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "param" },
+        "name": { "type": "string" },
+        "expr": { "type": "string" },
+        "location": { "type": "string" }
+      },
+      "required": ["$type", "name"],
+      "additionalProperties": false
+    },
+    "donedata": {
+      "type": "object",
+      "properties": {
+        "$type": { "const": "donedata" },
+        "children": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "$ref": "#/$defs/param" },
+              { "$ref": "#/$defs/content" }
+            ]
+          }
+        }
+      },
+      "required": ["$type"],
+      "additionalProperties": false
+    },
+    "scxmlChild": {
+      "oneOf": [
+        { "$ref": "#/$defs/state" },
+        { "$ref": "#/$defs/parallel" },
+        { "$ref": "#/$defs/final" },
+        { "$ref": "#/$defs/datamodel" },
+        { "$ref": "#/$defs/script" }
+      ]
+    },
+    "stateChild": {
+      "oneOf": [
+        { "$ref": "#/$defs/state" },
+        { "$ref": "#/$defs/parallel" },
+        { "$ref": "#/$defs/final" },
+        { "$ref": "#/$defs/history" },
+        { "$ref": "#/$defs/initial" },
+        { "$ref": "#/$defs/transition" },
+        { "$ref": "#/$defs/onentry" },
+        { "$ref": "#/$defs/onexit" },
+        { "$ref": "#/$defs/invoke" },
+        { "$ref": "#/$defs/datamodel" }
+      ]
+    },
+    "executableContent": {
+      "oneOf": [
+        { "$ref": "#/$defs/raise" },
+        { "$ref": "#/$defs/send" },
+        { "$ref": "#/$defs/cancel" },
+        { "$ref": "#/$defs/log" },
+        { "$ref": "#/$defs/assign" },
+        { "$ref": "#/$defs/script" },
+        { "$ref": "#/$defs/if" },
+        { "$ref": "#/$defs/foreach" }
+      ]
+    }
+  }
+}
