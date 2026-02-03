@@ -1,0 +1,144 @@
+/* Custom Starlight theme to match landing page */
+
+/* Import Geist fonts for Starlight */
+@font-face {
+  font-family: "Geist Sans";
+  src: url("/fonts/GeistVF.woff") format("woff");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/GeistMonoVF.woff") format("woff");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Override Starlight's default color scheme */
+:root {
+  /* Use Geist fonts */
+  --sl-font: "Geist Sans", ui-sans-serif, system-ui, sans-serif;
+  --sl-font-mono: "Geist Mono", ui-monospace, monospace;
+
+  /* Neutral gray scale (replacing bluish tint) */
+  --sl-color-white: hsl(0, 0%, 100%);
+  --sl-color-gray-1: hsl(0, 0%, 93%);
+  --sl-color-gray-2: hsl(0, 0%, 82%);
+  --sl-color-gray-3: hsl(0, 0%, 64%);
+  --sl-color-gray-4: hsl(0, 0%, 45%);
+  --sl-color-gray-5: hsl(0, 0%, 23%);
+  --sl-color-gray-6: hsl(0, 0%, 12%);
+  --sl-color-black: hsl(0, 0%, 4%); /* #0a0a0a - matches neutral-950 */
+
+  /* Accent color - dark highlight #1F1F1F */
+  --sl-color-accent-low: #1F1F1F;
+  --sl-color-accent: #1F1F1F;
+  --sl-color-accent-high: #ffffff;
+
+  /* Background colors - all same dark */
+  --sl-color-bg: var(--sl-color-black);
+  --sl-color-bg-nav: var(--sl-color-black);
+  --sl-color-bg-sidebar: var(--sl-color-black);
+  --sl-color-bg-inline-code: hsl(0, 0%, 10%);
+
+  /* Border/hairline colors */
+  --sl-color-hairline-light: hsl(0, 0%, 20%);
+  --sl-color-hairline: hsl(0, 0%, 15%);
+
+  /* Text colors */
+  --sl-color-text: hsl(0, 0%, 93%);
+  --sl-color-text-accent: var(--sl-color-accent-high);
+}
+
+/* Light mode - also dark to match site */
+:root[data-theme="light"] {
+  --sl-color-white: hsl(0, 0%, 100%);
+  --sl-color-gray-1: hsl(0, 0%, 93%);
+  --sl-color-gray-2: hsl(0, 0%, 82%);
+  --sl-color-gray-3: hsl(0, 0%, 64%);
+  --sl-color-gray-4: hsl(0, 0%, 45%);
+  --sl-color-gray-5: hsl(0, 0%, 23%);
+  --sl-color-gray-6: hsl(0, 0%, 12%);
+  --sl-color-black: hsl(0, 0%, 4%);
+
+  --sl-color-bg: var(--sl-color-black);
+  --sl-color-bg-nav: var(--sl-color-black);
+  --sl-color-bg-sidebar: var(--sl-color-black);
+  --sl-color-text: hsl(0, 0%, 93%);
+
+  --sl-color-accent-low: #1F1F1F;
+  --sl-color-accent: #1F1F1F;
+  --sl-color-accent-high: #ffffff;
+}
+
+/* Header styling */
+.site-title {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+}
+
+/* Sidebar styling */
+starlight-menu-button {
+  --sl-color-text: hsl(0, 0%, 93%);
+}
+
+/* Navigation links */
+nav a {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+}
+
+/* Content area */
+.sl-markdown-content {
+  --sl-color-text: hsl(0, 0%, 82%);
+}
+
+/* Code blocks */
+.expressive-code {
+  --ec-brdCol: hsl(0, 0%, 20%);
+}
+
+/* Borders to match landing page style */
+.card {
+  border-color: hsl(0, 0%, 20%);
+}
+
+/* Ensure all borders are neutral */
+:root {
+  --sl-color-hairline: hsl(0, 0%, 18%);
+  --sl-color-hairline-light: hsl(0, 0%, 18%);
+}
+
+/* Add borders between sections */
+nav.sidebar,
+.sidebar,
+#starlight__sidebar {
+  border-right: 1px solid hsl(0, 0%, 18%) !important;
+}
+
+header.header {
+  border-bottom: 1px solid hsl(0, 0%, 18%) !important;
+}
+
+/* Remove sidebar pane border */
+.sidebar-pane {
+  border-top: none !important;
+}
+
+/* More padding on menu items */
+.sidebar-content a {
+  padding: 0.5rem 1rem !important;
+}
+
+/* Sidebar active item - dark highlight with white text */
+[aria-current="page"],
+.sidebar a[aria-current="page"] {
+  background: #1F1F1F !important;
+  color: #ffffff !important;
+}

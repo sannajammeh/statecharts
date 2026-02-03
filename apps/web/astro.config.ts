@@ -10,6 +10,9 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Statecharts.sh Docs",
+      components: {
+        SiteTitle: "./src/components/starlight/SiteTitle.astro",
+      },
       defaultLocale: "root",
       locales: {
         root: { label: "English", lang: "en" },
@@ -38,7 +41,7 @@ export default defineConfig({
           autogenerate: { directory: "docs/examples" },
         },
       ],
-      customCss: [],
+      customCss: ["./src/styles/starlight.css"],
     }),
     react(),
     mdx(),
