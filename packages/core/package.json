@@ -8,6 +8,10 @@
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     },
+    "./schema": {
+      "types": "./dist/schema/index.d.mts",
+      "import": "./dist/schema/index.mjs"
+    },
     "./schema.json": "./schema.json"
   },
   "main": "./dist/index.mjs",

@@ -1,0 +1,138 @@
+---
+title: Hook API
+description: Full API reference for useStateChart hook.
+---
+
+## useStateChart
+
+```tsx
+function useStateChart<TContext, TEvent>(
+  chartOrInstance: Chart | ChartInstance,
+  options?: UseStateChartOptions
+): UseStateChartReturn;
+```
+
+### Parameters
+
+**chartOrInstance**
+
+Pass either a `Chart` or `ChartInstance`:
+
+- **Chart**: Hook creates and manages the instance lifecycle (starts on mount, stops on unmount)
+- **ChartInstance**: Hook subscribes only; you manage the lifecycle
+
+```tsx
+// Chart - hook manages lifecycle
+const { state, send } = useStateChart(myChart);
+
+// ChartInstance - you manage lifecycle
+const instance = myChart.start();
+const { state, send } = useStateChart(instance);
+```
+
+### Options
+
+```tsx
+interface UseStateChartOptions<TContext> {
+  initialContext?: Partial<TContext>;
+  onTransition?: (prev: IStateSnapshot, next: IStateSnapshot) => void;
+}
+```
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `initialContext` | `Partial<TContext>` | Override initial context (ignored for ChartInstance) |
+| `onTransition` | `(prev, next) => void` | Callback after each state transition |
+
+### Return Value
+
+```tsx
+interface UseStateChartReturn<TContext, TEvent> {
+  state: IStateSnapshot<TContext>;
+  send: (event: TEvent | TEvent["type"]) => void;
+  matches: (stateValue: string) => boolean;
+}
+```
+
+## Examples
+
+### Override Initial Context
+
+```tsx
+const counter = chart({
+  context: { count: 0 },
+  initial: "idle",
+  states: {
+    idle: {
+      on: {
+        INCREMENT: { actions: (ctx) => ({ count: ctx.count + 1 }) },
+      },
+    },
+  },
+});
+
+function Counter() {
+  const { state } = useStateChart(counter, {
+    initialContext: { count: 100 }, // Start at 100 instead of 0
+  });
+
+  return <span>{state.context.count}</span>;
+}
+```
+
+### Transition Callback
+
+```tsx
+function Toggle() {
+  const { state, send } = useStateChart(toggle, {
+    onTransition: (prev, next) => {
+      console.log(`State changed: ${prev.value} → ${next.value}`);
+      analytics.track("state_change", { from: prev.value, to: next.value });
+    },
+  });
+
+  return <button onClick={() => send("TOGGLE")}>{state.value}</button>;
+}
+```
+
+### Shared Instance
+
+Share state across multiple components:
+
+```tsx
+// Create instance outside components
+const sharedInstance = authChart.start();
+
+function LoginButton() {
+  const { send, matches } = useStateChart(sharedInstance);
+
+  if (matches("authenticated")) {
+    return <button onClick={() => send("LOGOUT")}>Logout</button>;
+  }
+
+  return <button onClick={() => send("LOGIN")}>Login</button>;
+}
+
+function UserProfile() {
+  const { state, matches } = useStateChart(sharedInstance);
+
+  if (!matches("authenticated")) {
+    return null;
+  }
+
+  return <div>Welcome, {state.context.user.name}</div>;
+}
+```
+
+## TypeScript
+
+The hook infers types from the chart definition:
+
+```tsx
+const { state, send } = useStateChart(counter);
+
+state.context.count;  // number
+state.value;          // "idle"
+send("INCREMENT");    // OK
+send("INVALID");      // Type error
+```

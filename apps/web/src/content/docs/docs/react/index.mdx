@@ -1,0 +1,55 @@
+---
+title: React Quick Start
+description: Get started with statecharts in React.
+---
+
+## Installation
+
+Install both the core library and React bindings:
+
+```bash
+npm install statecharts.sh @statecharts/react
+```
+
+## Basic Usage
+
+The `useStateChart` hook connects a statechart to your component:
+
+```tsx
+import { chart } from "statecharts.sh";
+import { useStateChart } from "@statecharts/react";
+
+const toggle = chart({
+  context: {},
+  initial: "inactive",
+  states: {
+    inactive: { on: { TOGGLE: "active" } },
+    active: { on: { TOGGLE: "inactive" } },
+  },
+});
+
+function Toggle() {
+  const { state, send, matches } = useStateChart(toggle);
+
+  return (
+    <button onClick={() => send("TOGGLE")}>
+      {matches("active") ? "ON" : "OFF"}
+    </button>
+  );
+}
+```
+
+## Return Value
+
+The hook returns:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `state` | `IStateSnapshot` | Current state with `value` and `context` |
+| `send` | `(event) => void` | Send events to the machine |
+| `matches` | `(stateValue) => boolean` | Check current state |
+
+## Next Steps
+
+- See [Patterns](/docs/react/patterns) for common usage patterns
+- Read the [Hook API](/docs/react/hook-api) for full options
