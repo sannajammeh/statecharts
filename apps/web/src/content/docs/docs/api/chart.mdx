@@ -34,7 +34,6 @@ Returns a `Chart` object with:
 |-----------------|------|-------------|
 | `definition` | `ChartDefinition` | The chart definition |
 | `start(initialContext?)` | `ChartInstance` | Create a running instance |
-| `export()` | `SCJSONDocument` | Export to SCJSON format |
 
 ## StateNode
 
@@ -149,4 +148,26 @@ const loginMachine = chart({
     },
   },
 });
+```
+
+## Exporting to SCJSON
+
+To export a chart to SCJSON format (JSON translation of SCXML), use the `exportSCJSON` function from the `/schema` subpath:
+
+```typescript
+import { chart } from "statecharts.sh";
+import { exportSCJSON } from "statecharts.sh/schema";
+
+const machine = chart({
+  id: "toggle",
+  context: {},
+  initial: "off",
+  states: {
+    off: { on: { TOGGLE: "on" } },
+    on: { on: { TOGGLE: "off" } },
+  },
+});
+
+const scjson = exportSCJSON(machine.definition);
+// Returns SCJSONDocument compatible with SCXML tooling
 ```
