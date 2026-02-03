@@ -12,14 +12,14 @@ The system SHALL provide Vitest configuration at the monorepo root that discover
 - **THEN** only tests in `packages/ui` workspace execute
 
 ### Requirement: Test file discovery
-The system SHALL discover test files matching the pattern `**/__tests__/**/*.test.{ts,tsx}`.
+The system SHALL discover test files matching the pattern `**/*.spec.{ts,tsx}`.
 
-#### Scenario: Colocated test discovery
-- **WHEN** a test file exists at `packages/ui/src/__tests__/Button.test.tsx`
+#### Scenario: Inline test discovery
+- **WHEN** a test file exists at `packages/core/src/instance.spec.ts`
 - **THEN** the test runner discovers and executes it
 
-#### Scenario: Ignore non-test files
-- **WHEN** a file exists at `packages/ui/src/__tests__/helpers.ts` (no `.test.` suffix)
+#### Scenario: Ignore non-spec files
+- **WHEN** a file exists at `packages/core/src/helpers.ts` (no `.spec.` suffix)
 - **THEN** the test runner does not execute it as a test
 
 ### Requirement: Coverage reporting
