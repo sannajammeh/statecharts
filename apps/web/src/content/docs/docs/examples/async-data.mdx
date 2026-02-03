@@ -227,60 +227,53 @@ const cachedFetch = chart<CachedContext<any>>({
 });
 ```
 
-## React Hook
+## React Integration
+
+Use the `useStateChart` hook from `@statecharts/react` which uses `useSyncExternalStore` internally for proper React 18+ concurrent rendering support:
 
 ```typescript
-import { useState, useEffect, useMemo } from "react";
+import { useStateChart } from "@statecharts/react";
+import { useEffect } from "react";
 
 function useFetch<T>(url: string) {
-  const machine = useMemo(
-    () =>
-      chart<FetchContext<T>>({
-        context: { data: null, error: null },
-        initial: "idle",
-        states: {
-          idle: { on: { FETCH: "loading" } },
-          loading: {
-            invoke: async () => {
-              const res = await fetch(url);
-              if (!res.ok) throw new Error(`HTTP ${res.status}`);
-              return res.json();
-            },
-            onDone: {
-              target: "success",
-              action: (_, e) => ({ data: e.data, error: null }),
-            },
-            onError: {
-              target: "error",
-              action: (_, e) => ({ error: e.error.message }),
-            },
-          },
-          success: { on: { REFRESH: "loading" } },
-          error: { on: { RETRY: "loading" } },
+  const fetchMachine = chart<FetchContext<T>>({
+    context: { data: null, error: null },
+    initial: "idle",
+    states: {
+      idle: { on: { FETCH: "loading" } },
+      loading: {
+        invoke: async () => {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
         },
-      }),
-    [url]
-  );
+        onDone: {
+          target: "success",
+          action: (_, e) => ({ data: e.data, error: null }),
+        },
+        onError: {
+          target: "error",
+          action: (_, e) => ({ error: e.error.message }),
+        },
+      },
+      success: { on: { REFRESH: "loading" } },
+      error: { on: { RETRY: "loading" } },
+    },
+  });
 
-  const [instance] = useState(() => machine.start());
-  const [state, setState] = useState(instance.state);
+  const { state, send } = useStateChart(fetchMachine);
 
   useEffect(() => {
-    const unsub = instance.subscribe(setState);
-    instance.send("FETCH"); // Auto-fetch on mount
-    return () => {
-      unsub();
-      instance.stop();
-    };
-  }, [instance]);
+    send("FETCH");
+  }, [send]);
 
   return {
     data: state.context.data,
     error: state.context.error,
     isLoading: state.matches("loading"),
     isError: state.matches("error"),
-    refetch: () => instance.send("REFRESH"),
-    retry: () => instance.send("RETRY"),
+    refetch: () => send("REFRESH"),
+    retry: () => send("RETRY"),
   };
 }
 ```
