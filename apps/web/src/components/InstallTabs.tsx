@@ -2,9 +2,9 @@ import { useState } from "react";
 import { CopyButton } from "./CopyButton";
 
 const installCommands = [
-  { label: "npm", command: "npm install statecharts" },
-  { label: "pnpm", command: "pnpm add statecharts" },
-  { label: "bun", command: "bun add statecharts" },
+  { label: "npm", command: "npm install statecharts.sh" },
+  { label: "pnpm", command: "pnpm add statecharts.sh" },
+  { label: "bun", command: "bun add statecharts.sh" },
 ] as const;
 
 export function InstallTabs() {
