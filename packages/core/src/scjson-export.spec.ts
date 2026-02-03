@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { chart } from "./chart.js";
+import { exportSCJSON } from "./scjson-export.js";
 import type { StateElement, FinalElement, ParallelElement } from "./scjson-types.js";
 
 describe("exportSCJSON", () => {
@@ -14,7 +15,7 @@ describe("exportSCJSON", () => {
         },
       });
 
-      const result = myChart.export();
+      const result = exportSCJSON(myChart.definition);
 
       expect(result.$type).toBe("scxml");
       expect(result.version).toBe("1.0");
@@ -36,7 +37,7 @@ describe("exportSCJSON", () => {
         states: { idle: {} },
       });
 
-      const result = myChart.export();
+      const result = exportSCJSON(myChart.definition);
       const json = JSON.stringify(result);
 
       expect(() => JSON.parse(json)).not.toThrow();
@@ -60,7 +61,7 @@ describe("exportSCJSON", () => {
         },
       });
 
-      const result = myChart.export();
+      const result = exportSCJSON(myChart.definition);
 
       const parentState = result.children[0] as StateElement;
       expect(parentState.$type).toBe("state");
@@ -69,8 +70,8 @@ describe("exportSCJSON", () => {
       expect(parentState.children).toBeDefined();
 
       const childStates = parentState.children!.filter(
-        (c) => c.$type === "state"
-      ) as StateElement[];
+        (c): c is StateElement => c.$type === "state"
+      );
       expect(childStates).toHaveLength(2);
       expect(childStates.map((s) => s.id).sort()).toEqual(["child1", "child2"]);
     });
@@ -104,15 +105,15 @@ describe("exportSCJSON", () => {
         },
       });
 
-      const result = myChart.export();
+      const result = exportSCJSON(myChart.definition);
 
       const parallelState = result.children[0] as ParallelElement;
       expect(parallelState.$type).toBe("parallel");
       expect(parallelState.id).toBe("parallel");
 
       const regions = parallelState.children!.filter(
-        (c) => c.$type === "state"
-      ) as StateElement[];
+        (c): c is StateElement => c.$type === "state"
+      );
       expect(regions).toHaveLength(2);
 
       const regionIds = regions.map((r) => r.id).sort();
@@ -136,13 +137,14 @@ describe("exportSCJSON", () => {
         },
       });
 
-      const result = myChart.export();
+      const result = exportSCJSON(myChart.definition);
 
       const finalState = result.children.find(
-        (c) => (c as StateElement | FinalElement).id === "done"
-      ) as FinalElement;
-      expect(finalState.$type).toBe("final");
-      expect(finalState.id).toBe("done");
+        (c): c is FinalElement =>
+          (c as StateElement | FinalElement).id === "done"
+      );
+      expect(finalState!.$type).toBe("final");
+      expect(finalState!.id).toBe("done");
     });
   });
 
@@ -160,13 +162,13 @@ describe("exportSCJSON", () => {
         },
       });
 
-      const result = myChart.export();
+      const result = exportSCJSON(myChart.definition);
 
       const idleState = result.children.find(
-        (c) => (c as StateElement).id === "idle"
-      ) as StateElement;
+        (c): c is StateElement => (c as StateElement).id === "idle"
+      );
 
-      const transition = idleState.children!.find((c) => c.$type === "transition");
+      const transition = idleState!.children!.find((c) => c.$type === "transition");
       expect(transition).toMatchObject({
         $type: "transition",
         event: "CLICK",
@@ -196,13 +198,13 @@ describe("exportSCJSON", () => {
         },
       });
 
-      const result = myChart.export();
+      const result = exportSCJSON(myChart.definition);
 
       const idleState = result.children.find(
-        (c) => (c as StateElement).id === "idle"
-      ) as StateElement;
+        (c): c is StateElement => (c as StateElement).id === "idle"
+      );
 
-      const transition = idleState.children!.find((c) => c.$type === "transition");
+      const transition = idleState!.children!.find((c) => c.$type === "transition");
       expect(transition).toMatchObject({
         $type: "transition",
         event: "SUBMIT",
@@ -231,13 +233,13 @@ describe("exportSCJSON", () => {
         },
       });
 
-      const result = myChart.export();
+      const result = exportSCJSON(myChart.definition);
 
       const idleState = result.children.find(
-        (c) => (c as StateElement).id === "idle"
-      ) as StateElement;
+        (c): c is StateElement => (c as StateElement).id === "idle"
+      );
 
-      const transition = idleState.children!.find((c) => c.$type === "transition") as any;
+      const transition = idleState!.children!.find((c) => c.$type === "transition") as any;
       expect(transition.children).toBeDefined();
       expect(transition.children[0]).toMatchObject({
         $type: "script",
@@ -262,14 +264,14 @@ describe("exportSCJSON", () => {
         },
       });
 
-      const result = myChart.export();
+      const result = exportSCJSON(myChart.definition);
 
       const waitingState = result.children.find(
-        (c) => (c as StateElement).id === "waiting"
-      ) as StateElement;
+        (c): c is StateElement => (c as StateElement).id === "waiting"
+      );
 
       // Should have onentry with send
-      const onentry = waitingState.children!.find((c) => c.$type === "onentry") as any;
+      const onentry = waitingState!.children!.find((c) => c.$type === "onentry") as any;
       expect(onentry).toBeDefined();
 
       const send = onentry.children.find((c: any) => c.$type === "send");
@@ -280,7 +282,7 @@ describe("exportSCJSON", () => {
       });
 
       // Should have transition for delayed event
-      const delayedTransition = waitingState.children!.find(
+      const delayedTransition = waitingState!.children!.find(
         (c) => c.$type === "transition" && (c as any).event === "__delay.waiting.1000"
       );
       expect(delayedTransition).toMatchObject({
@@ -312,13 +314,13 @@ describe("exportSCJSON", () => {
         },
       });
 
-      const result = myChart.export();
+      const result = exportSCJSON(myChart.definition);
 
       const loadingState = result.children.find(
-        (c) => (c as StateElement).id === "loading"
-      ) as StateElement;
+        (c): c is StateElement => (c as StateElement).id === "loading"
+      );
 
-      const invoke = loadingState.children!.find((c) => c.$type === "invoke") as any;
+      const invoke = loadingState!.children!.find((c) => c.$type === "invoke") as any;
       expect(invoke).toMatchObject({
         $type: "invoke",
         id: "loading.invoke",
@@ -327,14 +329,14 @@ describe("exportSCJSON", () => {
       });
 
       // Should have done.invoke transition
-      const doneTransition = loadingState.children!.find(
+      const doneTransition = loadingState!.children!.find(
         (c) => c.$type === "transition" && (c as any).event?.startsWith("done.invoke")
       );
       expect(doneTransition).toBeDefined();
       expect((doneTransition as any).target).toBe("success");
 
       // Should have error.invoke transition
-      const errorTransition = loadingState.children!.find(
+      const errorTransition = loadingState!.children!.find(
         (c) => c.$type === "transition" && (c as any).event?.startsWith("error.invoke")
       );
       expect(errorTransition).toBeDefined();
@@ -355,7 +357,7 @@ describe("exportSCJSON", () => {
         states: { idle: {} },
       });
 
-      const result = myChart.export();
+      const result = exportSCJSON(myChart.definition);
 
       const datamodel = result.children.find((c) => c.$type === "datamodel") as any;
       expect(datamodel).toBeDefined();
@@ -394,7 +396,7 @@ describe("exportSCJSON", () => {
         states: { idle: {} },
       });
 
-      const result = myChart.export();
+      const result = exportSCJSON(myChart.definition);
 
       const datamodel = result.children.find((c) => c.$type === "datamodel");
       expect(datamodel).toBeUndefined();
@@ -415,7 +417,7 @@ describe("exportSCJSON", () => {
         },
       });
 
-      const result = myChart.export();
+      const result = exportSCJSON(myChart.definition);
 
       // Validate root structure
       expect(result).toMatchObject({
@@ -430,36 +432,6 @@ describe("exportSCJSON", () => {
       for (const child of result.children) {
         expect(child).toHaveProperty("$type");
       }
-    });
-  });
-
-  describe("exportLegacy backwards compatibility", () => {
-    it("should return legacy format with version 1", () => {
-      const myChart = chart({
-        id: "legacy-test",
-        context: { count: 0 },
-        initial: "idle",
-        states: {
-          idle: {
-            on: { CLICK: "clicked" },
-          },
-          clicked: {},
-        },
-      });
-
-      const result = myChart.exportLegacy();
-
-      expect(result).toMatchObject({
-        version: 1,
-        id: "legacy-test",
-        initial: "idle",
-        context: { count: 0 },
-      });
-
-      expect(result.states).toBeDefined();
-      const idleState = result.states["idle"];
-      expect(idleState).toBeDefined();
-      expect(idleState!.on).toHaveProperty("CLICK");
     });
   });
 });

@@ -295,62 +295,6 @@ describe('chart', () => {
     });
   });
 
-  describe('export serialization', () => {
-    it('should export to JSON-serializable format', () => {
-      function increment(ctx: { count: number }) {
-        return { count: ctx.count + 1 };
-      }
-
-      const m = chart({
-        id: 'counter',
-        context: { count: 0 },
-        initial: 'idle',
-        states: {
-          idle: {
-            entry: increment,
-            on: {
-              INC: { target: 'idle', action: increment },
-            },
-          },
-        },
-      });
-
-      const exported = m.export();
-
-      expect(exported.version).toBe(1);
-      expect(exported.id).toBe('counter');
-      expect(exported.initial).toBe('idle');
-      expect(exported.context).toEqual({ count: 0 });
-      expect(exported.states.idle?.entry).toEqual(['increment']);
-      expect(exported.states.idle?.on.INC).toEqual({
-        target: 'idle',
-        guard: null,
-        actions: ['increment'],
-      });
-
-      // Should be JSON serializable
-      const json = JSON.stringify(exported);
-      expect(typeof json).toBe('string');
-      expect(JSON.parse(json)).toEqual(exported);
-    });
-
-    it('should use "anonymous" for arrow functions', () => {
-      const m = chart({
-        context: { count: 0 },
-        initial: 'idle',
-        states: {
-          idle: {
-            entry: (ctx) => ({ count: ctx.count + 1 }),
-            on: { INC: { action: (ctx) => ({ count: ctx.count + 1 }) } },
-          },
-        },
-      });
-
-      const exported = m.export();
-      expect(exported.states.idle?.entry).toEqual(['anonymous']);
-    });
-  });
-
   describe('entry/exit actions', () => {
     it('should execute entry actions on enter', () => {
       const m = chart({
