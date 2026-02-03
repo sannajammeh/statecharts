@@ -1,4 +1,4 @@
-import { useSyncExternalStore, useRef, useCallback } from "react";
+import { useSyncExternalStore, useRef, useCallback, useEffect } from "react";
 import type {
   Chart,
   ChartInstance,
@@ -114,16 +114,21 @@ export function useStateChart<
         onStoreChange();
       });
 
-      // Cleanup: unsubscribe always, stop only if we own the instance
-      return () => {
-        unsubscribe();
-        if (owned) {
-          instance.stop();
-        }
-      };
+      // Cleanup: only unsubscribe (instance lifecycle handled separately)
+      return unsubscribe;
     },
-    [instance, owned]
+    [instance]
   );
+
+  // Stop owned instances on unmount (separate from subscription lifecycle
+  // to handle React 18+ Strict Mode double-mounting correctly)
+  useEffect(() => {
+    return () => {
+      if (owned) {
+        instance.stop();
+      }
+    };
+  }, [instance, owned]);
 
   // Get current snapshot
   const getSnapshot = useCallback(() => instance.state, [instance]);
