@@ -1,0 +1,263 @@
+---
+title: Form Validation
+description: Managing form state with validation feedback.
+---
+
+Form validation is a common use case where statecharts shine. This example shows:
+- Multiple form fields in context
+- Validation guards
+- Error state handling
+
+## Basic Form
+
+```typescript
+import { chart } from "statecharts.sh";
+
+interface FormContext {
+  email: string;
+  password: string;
+  errors: {
+    email?: string;
+    password?: string;
+  };
+}
+
+const loginForm = chart<FormContext>({
+  context: {
+    email: "",
+    password: "",
+    errors: {},
+  },
+  initial: "editing",
+  states: {
+    editing: {
+      on: {
+        SET_EMAIL: {
+          action: (ctx, event) => ({
+            email: event.value,
+            errors: { ...ctx.errors, email: undefined },
+          }),
+        },
+        SET_PASSWORD: {
+          action: (ctx, event) => ({
+            password: event.value,
+            errors: { ...ctx.errors, password: undefined },
+          }),
+        },
+        SUBMIT: [
+          {
+            target: "submitting",
+            guard: (ctx) => isValid(ctx),
+          },
+          {
+            target: "editing",
+            action: (ctx) => ({
+              errors: validate(ctx),
+            }),
+          },
+        ],
+      },
+    },
+    submitting: {
+      invoke: async (ctx) => {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          body: JSON.stringify({
+            email: ctx.email,
+            password: ctx.password,
+          }),
+        });
+        if (!response.ok) throw new Error("Login failed");
+        return response.json();
+      },
+      onDone: { target: "success" },
+      onError: {
+        target: "editing",
+        action: (ctx, event) => ({
+          errors: { email: event.error.message },
+        }),
+      },
+    },
+    success: {
+      final: true,
+    },
+  },
+});
+
+function isValid(ctx: FormContext): boolean {
+  return ctx.email.includes("@") && ctx.password.length >= 8;
+}
+
+function validate(ctx: FormContext) {
+  const errors: FormContext["errors"] = {};
+  if (!ctx.email.includes("@")) {
+    errors.email = "Invalid email address";
+  }
+  if (ctx.password.length < 8) {
+    errors.password = "Password must be at least 8 characters";
+  }
+  return errors;
+}
+```
+
+## With Field-Level States
+
+For more complex forms, track each field's state:
+
+```typescript
+const form = chart({
+  context: {
+    email: "",
+    emailTouched: false,
+    password: "",
+    passwordTouched: false,
+  },
+  initial: "idle",
+  states: {
+    idle: {
+      on: {
+        FOCUS_EMAIL: "editingEmail",
+        FOCUS_PASSWORD: "editingPassword",
+        SUBMIT: {
+          target: "validating",
+          action: () => ({
+            emailTouched: true,
+            passwordTouched: true,
+          }),
+        },
+      },
+    },
+    editingEmail: {
+      on: {
+        CHANGE_EMAIL: {
+          action: (ctx, e) => ({ email: e.value }),
+        },
+        BLUR_EMAIL: {
+          target: "idle",
+          action: () => ({ emailTouched: true }),
+        },
+      },
+    },
+    editingPassword: {
+      on: {
+        CHANGE_PASSWORD: {
+          action: (ctx, e) => ({ password: e.value }),
+        },
+        BLUR_PASSWORD: {
+          target: "idle",
+          action: () => ({ passwordTouched: true }),
+        },
+      },
+    },
+    validating: {
+      entry: (ctx) => {
+        // Validation happens here
+      },
+      on: {
+        "": [
+          { target: "submitting", guard: (ctx) => isFormValid(ctx) },
+          { target: "idle" },
+        ],
+      },
+    },
+    submitting: {
+      invoke: async (ctx) => submitForm(ctx),
+      onDone: "success",
+      onError: "idle",
+    },
+    success: { final: true },
+  },
+});
+```
+
+## React Hook
+
+```typescript
+import { useState, useEffect, useCallback } from "react";
+
+function useLoginForm() {
+  const [instance] = useState(() => loginForm.start());
+  const [state, setState] = useState(instance.state);
+
+  useEffect(() => {
+    const unsub = instance.subscribe(setState);
+    return () => {
+      unsub();
+      instance.stop();
+    };
+  }, [instance]);
+
+  const setEmail = useCallback(
+    (value: string) => instance.send({ type: "SET_EMAIL", value }),
+    [instance]
+  );
+
+  const setPassword = useCallback(
+    (value: string) => instance.send({ type: "SET_PASSWORD", value }),
+    [instance]
+  );
+
+  const submit = useCallback(
+    () => instance.send("SUBMIT"),
+    [instance]
+  );
+
+  return {
+    email: state.context.email,
+    password: state.context.password,
+    errors: state.context.errors,
+    isSubmitting: state.matches("submitting"),
+    isSuccess: state.matches("success"),
+    setEmail,
+    setPassword,
+    submit,
+  };
+}
+```
+
+## Usage
+
+```tsx
+function LoginForm() {
+  const {
+    email,
+    password,
+    errors,
+    isSubmitting,
+    isSuccess,
+    setEmail,
+    setPassword,
+    submit,
+  } = useLoginForm();
+
+  if (isSuccess) {
+    return <p>Login successful!</p>;
+  }
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); submit(); }}>
+      <div>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={isSubmitting}
+        />
+        {errors.email && <span>{errors.email}</span>}
+      </div>
+      <div>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={isSubmitting}
+        />
+        {errors.password && <span>{errors.password}</span>}
+      </div>
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Logging in..." : "Login"}
+      </button>
+    </form>
+  );
+}
+```

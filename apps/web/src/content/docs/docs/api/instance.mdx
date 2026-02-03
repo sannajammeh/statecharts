@@ -1,0 +1,195 @@
+---
+title: ChartInstance
+description: Runtime instance of a statechart.
+---
+
+A `ChartInstance` is created by calling `chart.start()`. It represents a running statechart that can receive events and emit state changes.
+
+## Creating an Instance
+
+```typescript
+import { chart } from "statecharts.sh";
+
+const toggle = chart({
+  context: { enabled: false },
+  initial: "off",
+  states: {
+    off: { on: { TOGGLE: "on" } },
+    on: { on: { TOGGLE: "off" } },
+  },
+});
+
+// Start with default context
+const instance = toggle.start();
+
+// Or override initial context
+const instance = toggle.start({ enabled: true });
+```
+
+## Properties
+
+### `state`
+
+The current state snapshot.
+
+```typescript
+interface IStateSnapshot<TContext> {
+  value: StateValue;          // Current state value
+  context: Readonly<TContext>; // Current context
+  done: boolean;              // True if in final state
+  path: readonly string[];    // Full state path
+  timestamp: number;          // When snapshot was created
+  matches(value: string): boolean; // Check if in state
+}
+```
+
+Example:
+
+```typescript
+const instance = toggle.start();
+
+console.log(instance.state.value);   // "off"
+console.log(instance.state.context); // { enabled: false }
+console.log(instance.state.done);    // false
+console.log(instance.state.matches("off")); // true
+```
+
+## Methods
+
+### `send(event)`
+
+Send an event to trigger a transition.
+
+```typescript
+// Send event by type string
+instance.send("TOGGLE");
+
+// Send event with payload
+instance.send({ type: "SET_VALUE", value: 42 });
+```
+
+### `subscribe(listener)`
+
+Subscribe to state changes. Returns an unsubscribe function.
+
+```typescript
+const unsubscribe = instance.subscribe((state) => {
+  console.log("State changed:", state.value);
+  console.log("Context:", state.context);
+});
+
+instance.send("TOGGLE"); // triggers listener
+
+unsubscribe(); // stop listening
+```
+
+### `onTransition(listener)`
+
+Listen to events being sent. Useful for debugging or logging.
+
+```typescript
+const unsubscribe = instance.onTransition((event) => {
+  console.log("Event sent:", event.type);
+});
+```
+
+### `stop()`
+
+Stop the instance and clean up resources (timers, invocations).
+
+```typescript
+instance.stop();
+
+// After stopping, send() has no effect
+instance.send("TOGGLE"); // ignored
+```
+
+## State Value
+
+The `state.value` property represents the current state:
+
+```typescript
+// Simple state
+instance.state.value // "loading"
+
+// Nested state
+instance.state.value // { authenticated: "idle" }
+
+// Use path for full hierarchy
+instance.state.path // ["authenticated", "idle"]
+```
+
+## Matching States
+
+Use `matches()` to check current state:
+
+```typescript
+if (instance.state.matches("loading")) {
+  // Show spinner
+}
+
+// For nested states, check any level
+const nested = chart({
+  context: {},
+  initial: "auth",
+  states: {
+    auth: {
+      initial: "login",
+      states: {
+        login: {},
+        register: {},
+      },
+    },
+  },
+});
+
+const inst = nested.start();
+inst.state.matches("auth");       // true
+inst.state.matches("auth.login"); // true (if at login)
+```
+
+## Example: React Integration
+
+```typescript
+import { useState, useEffect } from "react";
+import { chart } from "statecharts.sh";
+
+const fetchMachine = chart({
+  context: { data: null, error: null },
+  initial: "idle",
+  states: {
+    idle: { on: { FETCH: "loading" } },
+    loading: {
+      invoke: async () => {
+        const res = await fetch("/api/data");
+        return res.json();
+      },
+      onDone: {
+        target: "success",
+        action: (ctx, e) => ({ data: e.data }),
+      },
+      onError: {
+        target: "error",
+        action: (ctx, e) => ({ error: e.error }),
+      },
+    },
+    success: { on: { RETRY: "loading" } },
+    error: { on: { RETRY: "loading" } },
+  },
+});
+
+function useMachine() {
+  const [state, setState] = useState(() => fetchMachine.start().state);
+  const [instance] = useState(() => fetchMachine.start());
+
+  useEffect(() => {
+    const unsub = instance.subscribe(setState);
+    return () => {
+      unsub();
+      instance.stop();
+    };
+  }, [instance]);
+
+  return [state, instance.send.bind(instance)] as const;
+}
+```
