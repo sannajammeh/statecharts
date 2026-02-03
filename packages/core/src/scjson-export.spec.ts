@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { chart } from "../chart.js";
-import type { StateElement, FinalElement, ParallelElement } from "../scjson-types.js";
+import { chart } from "./chart.js";
+import type { StateElement, FinalElement, ParallelElement } from "./scjson-types.js";
 
 describe("exportSCJSON", () => {
   describe("minimal chart export", () => {
