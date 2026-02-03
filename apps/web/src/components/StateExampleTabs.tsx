@@ -9,37 +9,13 @@ const trafficLightJsonExample = `{
   "context": {},
   "states": {
     "red": {
-      "entry": [],
-      "exit": [],
-      "on": {
-        "TIMER": {
-          "target": "green",
-          "guard": null,
-          "actions": []
-        }
-      }
+      "on": { "TIMER": { "target": "green" } }
     },
     "green": {
-      "entry": [],
-      "exit": [],
-      "on": {
-        "TIMER": {
-          "target": "yellow",
-          "guard": null,
-          "actions": []
-        }
-      }
+      "on": { "TIMER": { "target": "yellow" } }
     },
     "yellow": {
-      "entry": [],
-      "exit": [],
-      "on": {
-        "TIMER": {
-          "target": "red",
-          "guard": null,
-          "actions": []
-        }
-      }
+      "on": { "TIMER": { "target": "red" } }
     }
   }
 }`;

@@ -32,7 +32,6 @@
   "$defs": {
     "ExportedTransition": {
       "type": "object",
-      "required": ["guard", "actions"],
       "properties": {
         "target": {
           "type": "string",
@@ -75,7 +74,6 @@
     },
     "ExportedStateNode": {
       "type": "object",
-      "required": ["entry", "exit", "on"],
       "properties": {
         "entry": {
           "type": "array",
