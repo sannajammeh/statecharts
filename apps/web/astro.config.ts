@@ -9,8 +9,5 @@ export default defineConfig({
   integrations: [react(), mdx()],
   vite: {
     plugins: [tailwindcss()],
-    optimizeDeps: {
-      include: ["statecharts.sh"],
-    },
   },
 });
