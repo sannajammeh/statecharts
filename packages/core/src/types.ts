@@ -106,11 +106,17 @@ export interface ChartInstance<TContext extends AnyContext, TEvent extends BaseE
   stop(): void;
 }
 
+// Import SCJSON types for export method
+import type { SCJSONDocument } from "./scjson-types.js";
+
 // Chart type
 export interface Chart<TContext extends AnyContext, TEvent extends BaseEvent = BaseEvent> {
   readonly definition: ChartDefinition<TContext, TEvent>;
   start(initialContext?: Partial<TContext>): ChartInstance<TContext, TEvent>;
-  export(): ExportedChart;
+  /** Exports the chart to SCJSON format (SCXML-compatible JSON) */
+  export(): SCJSONDocument;
+  /** Exports the chart to the legacy format (v1) */
+  exportLegacy(): ExportedChart;
 }
 
 // Export types
