@@ -1,24 +1,17 @@
 import { useState } from "react";
 import { highlight } from "sugar-high";
 
-const trafficLightJsonExample = `{
-  "$schema": "https://statecharts.sh/schema.json",
-  "version": 1,
-  "id": "trafficLight",
-  "initial": "red",
-  "context": {},
-  "states": {
-    "red": {
-      "on": { "TIMER": { "target": "green" } }
-    },
-    "green": {
-      "on": { "TIMER": { "target": "yellow" } }
-    },
-    "yellow": {
-      "on": { "TIMER": { "target": "red" } }
-    }
+const trafficLightCodeExample = `import { chart } from "statecharts.sh"
+
+const trafficLight = chart({
+  context: {},
+  initial: "red",
+  states: {
+    red: { on: { TIMER: "green" } },
+    green: { on: { TIMER: "yellow" } },
+    yellow: { on: { TIMER: "red" } },
   }
-}`;
+})`;
 
 const stateGraphExample = `    ┌─────┐         ┌───────┐
     │ red │ ───────▶│ green │
@@ -33,14 +26,14 @@ const stateGraphExample = `    ┌─────┐         ┌─────�
               ▼`;
 
 const stateExampleTabs = [
-  { label: "State Code", content: trafficLightJsonExample, language: "json" as const },
+  { label: "State Code", content: trafficLightCodeExample, language: "typescript" as const },
   { label: "State Graph", content: stateGraphExample, language: "text" as const },
 ] as const;
 
 export function StateExampleTabs() {
   const [active, setActive] = useState(0);
   const activeTab = stateExampleTabs[active];
-  const html = activeTab?.language === "json" ? highlight(activeTab.content) : null;
+  const html = activeTab?.language === "typescript" ? highlight(activeTab.content) : null;
 
   return (
     <div className="mt-6 border border-neutral-800">
@@ -60,7 +53,7 @@ export function StateExampleTabs() {
         ))}
       </div>
       <div className="bg-neutral-900">
-        {activeTab?.language === "json" ? (
+        {activeTab?.language === "typescript" ? (
           <pre className="overflow-x-auto p-4 text-xs leading-relaxed">
             <code dangerouslySetInnerHTML={{ __html: html ?? "" }} />
           </pre>

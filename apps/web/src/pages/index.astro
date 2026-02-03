@@ -137,20 +137,21 @@ function TrafficLight() {
         <h2 class="text-xs font-bold uppercase tracking-widest">Open Standard</h2>
         <div class="mt-4 border border-neutral-800 p-6">
           <p class="text-sm text-neutral-400">
-            Statecharts.sh defines a JSON Schema for statechart exports, enabling validation,
-            editor autocomplete, and interoperability between tools.
+            Statecharts.sh uses SCJSON—a JSON translation of the W3C SCXML specification—for
+            interoperability between tools. Export your statecharts to SCJSON for validation,
+            visualization, and cross-platform compatibility.
           </p>
           <p class="mt-4 text-sm text-neutral-400">
-            Use the schema to validate your statechart definitions, generate documentation, or
+            Use the schema to validate SCJSON exports, generate documentation, or
             build custom tooling around the standard format.
           </p>
           <div class="mt-6 flex items-center justify-between border border-neutral-800 px-4 py-3">
-            <span class="text-xs uppercase tracking-wide">JSON Schema</span>
+            <span class="text-xs uppercase tracking-wide">SCJSON Schema</span>
             <a
-              href="/schema.json"
+              href="/scjson/1.0.json"
               class="flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200"
             >
-              /schema.json <span>→</span>
+              /scjson/1.0.json <span>→</span>
             </a>
           </div>
         </div>

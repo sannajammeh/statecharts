@@ -12,11 +12,11 @@
       "types": "./dist/schema/index.d.mts",
       "import": "./dist/schema/index.mjs"
     },
-    "./schema.json": "./schema.json"
+    "./scjson.schema.json": "./scjson.schema.json"
   },
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "files": ["dist", "schema.json"],
+  "files": ["dist", "scjson.schema.json"],
   "scripts": {
     "build": "tsdown",
     "check-types": "tsc --noEmit",
