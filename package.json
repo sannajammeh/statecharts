@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.13",
-    "@vitest/coverage-v8": "^3.0.5",
+    "@vitest/coverage-v8": "^4.0.18",
     "turbo": "^2.8.1",
     "typescript": "5.9.2",
     "vitest": "^4.0.18"
