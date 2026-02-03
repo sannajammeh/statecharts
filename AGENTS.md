@@ -13,7 +13,7 @@ apps/
   web/                # Next.js app (App Router, port 3000)
   visualizer/         # Vite-based visualizer app
 packages/
-  core/               # Statechart library (@statecharts/core)
+  core/               # Statechart library (statecharts.sh)
   ui/                 # React component library (@statecharts/ui)
   eslint-config/      # Shared ESLint configs
   typescript-config/  # Shared TS configs
@@ -36,7 +36,7 @@ npm run test:coverage    # Run tests with coverage
 # Package-specific commands
 turbo build --filter=web                    # Build specific package
 turbo dev --filter=@statecharts/ui          # Dev specific package
-turbo lint --filter=@statecharts/core       # Lint specific package
+turbo lint --filter=statecharts.sh          # Lint specific package
 
 # Test commands (single test)
 npm run test -- packages/core/src/__tests__/chart.test.ts
@@ -101,7 +101,7 @@ export const Button = ({ children, className = "", appName }: ButtonProps) => {
 ### Imports
 - **Order**: React → Next.js → External libs → Internal packages → Local
 - **Type imports**: Use `import type { Foo } from "bar"`
-- **Internal packages**: Use `@statecharts/` prefix (e.g., `@statecharts/core`)
+- **Internal packages**: Use `@statecharts/` prefix (e.g., `@statecharts/ui`), except `statecharts.sh` (core)
 - **File extensions**: Include `.js` for imports in core package
 
 ### Error Handling

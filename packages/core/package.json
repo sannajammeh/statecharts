@@ -1,7 +1,7 @@
 {
-  "name": "statecharts",
-  "version": "0.0.0",
-  "private": true,
+  "name": "statecharts.sh",
+  "version": "0.0.1",
+  "private": false,
   "type": "module",
   "exports": {
     ".": {
@@ -14,16 +14,15 @@
   "types": "./dist/index.d.ts",
   "files": ["dist", "schema.json"],
   "scripts": {
-    "build": "rolldown -c",
+    "build": "tsdown",
     "check-types": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "devDependencies": {
     "@statecharts/typescript-config": "*",
-    "rolldown": "^1.0.0-rc.2",
+    "tsdown": "^0.20.1",
     "typescript": "5.9.2",
-    "unplugin-isolated-decl": "^0.14.0",
     "vitest": "^3.2.4"
   }
 }
