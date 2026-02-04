@@ -1,0 +1,77 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+
+const articles = await getCollection("articles", ({ data }) => !data.draft);
+
+const sortedArticles = articles.sort(
+  (a, b) => b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf()
+);
+---
+
+<BaseLayout
+  title="Articles | Statecharts.sh"
+  description="Updates, tutorials, and deep dives into state machines and statecharts"
+>
+  <div class="min-h-screen bg-neutral-950">
+    <div class="mx-auto max-w-4xl px-6 py-12">
+      <!-- Header -->
+      <header class="mb-8 flex items-center justify-between">
+        <a
+          href="/"
+          class="flex items-center gap-2 font-mono text-sm font-bold uppercase tracking-widest text-neutral-200 no-underline hover:text-white"
+        >
+          <img src="/logo.svg" alt="" class="h-5 w-5 invert" />
+          <span>Statecharts.sh</span>
+        </a>
+        <nav class="flex items-center gap-6">
+          <a
+            href="/docs"
+            class="text-xs uppercase tracking-wide text-neutral-500 no-underline transition-colors hover:text-neutral-300"
+          >
+            Docs
+          </a>
+          <a
+            href="/articles"
+            class="text-xs uppercase tracking-wide text-neutral-300 no-underline"
+          >
+            Articles
+          </a>
+        </nav>
+      </header>
+
+      <!-- Page Title -->
+      <h1 class="mb-2 font-mono text-xs font-bold uppercase tracking-widest text-neutral-200">
+        Articles
+      </h1>
+      <p class="mb-8 text-sm text-neutral-500">
+        Updates, tutorials, and deep dives into state machines and statecharts
+      </p>
+
+      <!-- Article List -->
+      <section class="flex flex-col gap-3">
+        {sortedArticles.map((article) => {
+          const formattedDate = new Intl.DateTimeFormat("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          }).format(article.data.publishedDate);
+
+          return (
+            <ArticleCard
+              title={article.data.title}
+              description={article.data.description}
+              href={`/articles/${article.id}`}
+              date={formattedDate}
+            />
+          );
+        })}
+      </section>
+
+      {sortedArticles.length === 0 && (
+        <p class="text-sm text-neutral-600">No articles yet. Check back soon!</p>
+      )}
+    </div>
+  </div>
+</BaseLayout>

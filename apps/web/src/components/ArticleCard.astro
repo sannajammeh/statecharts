@@ -9,62 +9,24 @@ interface Props {
 const { title, description, href, date } = Astro.props;
 ---
 
-<a href={href} class="article-card">
-  <div class="article-content">
-    <h3 class="article-title">{title}</h3>
-    <p class="article-description">{description}</p>
+<a
+  href={href}
+  class="group flex items-center gap-4 border border-neutral-800 px-5 py-4 no-underline transition-colors hover:border-neutral-600"
+>
+  <div class="flex-1">
+    <h3 class="m-0 text-sm font-medium uppercase tracking-wide text-neutral-200">
+      {title}
+    </h3>
+    <p class="m-0 mt-1 text-xs text-neutral-500">
+      {description}
+    </p>
   </div>
-  {date && <span class="article-date">{date}</span>}
-  <span class="article-arrow">→</span>
+  {date && (
+    <span class="text-[10px] uppercase tracking-wide text-neutral-600">
+      {date}
+    </span>
+  )}
+  <span class="text-neutral-600 transition-colors group-hover:text-neutral-300">
+    &rarr;
+  </span>
 </a>
-
-<style>
-  .article-card {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
-    border: 1px solid hsl(0, 0%, 18%);
-    text-decoration: none;
-    transition: border-color 0.2s;
-  }
-
-  .article-card:hover {
-    border-color: hsl(0, 0%, 30%);
-  }
-
-  .article-content {
-    flex: 1;
-  }
-
-  .article-title {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: hsl(0, 0%, 93%);
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .article-description {
-    font-size: 0.75rem;
-    color: hsl(0, 0%, 64%);
-    margin: 0.25rem 0 0;
-  }
-
-  .article-date {
-    font-size: 0.625rem;
-    color: hsl(0, 0%, 45%);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .article-arrow {
-    color: hsl(0, 0%, 45%);
-    transition: color 0.2s;
-  }
-
-  .article-card:hover .article-arrow {
-    color: hsl(0, 0%, 82%);
-  }
-</style>

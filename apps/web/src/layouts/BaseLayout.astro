@@ -1,4 +1,6 @@
 ---
+import "../styles/globals.css";
+
 interface Props {
   title?: string;
   description?: string;
@@ -98,7 +100,3 @@ const articleSchema = article
     <slot />
   </body>
 </html>
-
-<style is:global>
-  @import "../styles/globals.css";
-</style>

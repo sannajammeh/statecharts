@@ -1,105 +1,96 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
 interface Props {
-  title?: string;
+  title: string;
+  description: string;
+  author?: string;
+  publishedDate?: Date;
+  updatedDate?: Date;
 }
 
-const { title } = Astro.props;
+const { title, description, author, publishedDate, updatedDate } = Astro.props;
+
+const formattedDate = publishedDate
+  ? new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(publishedDate)
+  : undefined;
+
+const formattedUpdatedDate = updatedDate
+  ? new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(updatedDate)
+  : undefined;
 ---
 
-<div class="article-layout">
-  <header class="article-header">
-    <a href="/" class="site-title">
-      <img src="/logo.svg" alt="" class="site-logo" />
-      <span>Statecharts.sh</span>
-    </a>
-    <nav class="nav-links">
-      <a href="/docs" class="nav-link">Docs</a>
-      <a href="/articles" class="nav-link">Articles</a>
-    </nav>
-  </header>
+<BaseLayout
+  title={`${title} | Statecharts.sh`}
+  description={description}
+  ogType="article"
+  article={publishedDate ? { publishedTime: publishedDate.toISOString(), author: author ?? "Statecharts Team" } : undefined}
+>
+  <div class="min-h-screen bg-neutral-950">
+    <div class="mx-auto max-w-4xl px-6 py-12">
+      <!-- Header -->
+      <header class="mb-8 flex items-center justify-between">
+        <a
+          href="/"
+          class="flex items-center gap-2 font-mono text-sm font-bold uppercase tracking-widest text-neutral-200 no-underline hover:text-white"
+        >
+          <img src="/logo.svg" alt="" class="h-5 w-5 invert" />
+          <span>Statecharts.sh</span>
+        </a>
+        <nav class="flex items-center gap-6">
+          <a
+            href="/docs"
+            class="text-xs uppercase tracking-wide text-neutral-500 no-underline transition-colors hover:text-neutral-300"
+          >
+            Docs
+          </a>
+          <a
+            href="/articles"
+            class="text-xs uppercase tracking-wide text-neutral-500 no-underline transition-colors hover:text-neutral-300"
+          >
+            Articles
+          </a>
+        </nav>
+      </header>
 
-  {title && <h1 class="article-title">{title}</h1>}
+      <!-- Article Header -->
+      <div class="mb-8 border-b border-neutral-800 pb-8">
+        <h1 class="mb-4 font-mono text-2xl font-bold uppercase tracking-wide text-neutral-100">
+          {title}
+        </h1>
+        <p class="mb-4 text-sm leading-relaxed text-neutral-400">
+          {description}
+        </p>
+        <div class="flex items-center gap-4 text-xs text-neutral-500">
+          {author && <span>By {author}</span>}
+          {formattedDate && <span>{formattedDate}</span>}
+          {formattedUpdatedDate && <span class="text-neutral-600">Updated {formattedUpdatedDate}</span>}
+        </div>
+      </div>
 
-  <div class="article-content">
-    <slot />
+      <!-- Article Content -->
+      <article class="prose prose-invert prose-sm max-w-none prose-headings:font-mono prose-headings:uppercase prose-headings:tracking-wide prose-h2:text-lg prose-h3:text-base prose-p:text-neutral-400 prose-p:leading-relaxed prose-a:text-neutral-300 prose-a:underline-offset-2 hover:prose-a:text-white prose-strong:text-neutral-200 prose-code:rounded prose-code:bg-neutral-900 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-neutral-300 prose-pre:bg-neutral-900 prose-pre:border prose-pre:border-neutral-800 prose-ul:text-neutral-400 prose-ol:text-neutral-400 prose-li:marker:text-neutral-600">
+        <slot />
+      </article>
+
+      <!-- Footer -->
+      <footer class="mt-16 border-t border-neutral-800 pt-8">
+        <a
+          href="/articles"
+          class="inline-flex items-center gap-2 text-xs uppercase tracking-wide text-neutral-500 no-underline transition-colors hover:text-neutral-300"
+        >
+          <span>&larr;</span>
+          <span>Back to Articles</span>
+        </a>
+      </footer>
+    </div>
   </div>
-</div>
-
-<style>
-  .article-layout {
-    max-width: 56rem;
-    margin: 0 auto;
-    padding: 3rem 1.5rem 4rem;
-    font-family: "Geist Sans", ui-sans-serif, system-ui, sans-serif;
-  }
-
-  .article-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-  }
-
-  .site-title {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    color: hsl(0, 0%, 93%);
-    font-family: "Geist Mono", ui-monospace, monospace;
-    font-size: 0.875rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-
-  .site-logo {
-    width: 1.25rem;
-    height: 1.25rem;
-    filter: invert(1);
-  }
-
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-  }
-
-  .nav-link {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: hsl(0, 0%, 64%);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .nav-link:hover {
-    color: hsl(0, 0%, 82%);
-  }
-
-  .article-title {
-    font-family: "Geist Mono", ui-monospace, monospace;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin: 0 0 1.5rem 0;
-    color: hsl(0, 0%, 93%);
-  }
-
-  .article-content {
-    color: hsl(0, 0%, 64%);
-    font-size: 0.875rem;
-    line-height: 1.6;
-  }
-
-  .article-content :global(h1),
-  .article-content :global(h2),
-  .article-content :global(h3),
-  .article-content :global(h4),
-  .article-content :global(h5),
-  .article-content :global(h6) {
-    font-family: "Geist Mono", ui-monospace, monospace;
-  }
-</style>
+</BaseLayout>
