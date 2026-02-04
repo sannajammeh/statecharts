@@ -12,6 +12,8 @@ export default defineConfig({
       title: "Statecharts.sh Docs",
       components: {
         SiteTitle: "./src/components/starlight/SiteTitle.astro",
+        Header: "./src/components/starlight/Header.astro",
+        PageFrame: "./src/components/starlight/PageFrame.astro",
       },
       defaultLocale: "root",
       locales: {

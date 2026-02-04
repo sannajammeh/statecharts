@@ -1,0 +1,8 @@
+---
+import Default from "@astrojs/starlight/components/Header.astro";
+
+const routeId = Astro.locals.starlightRoute.id;
+const isArticles = routeId.startsWith("articles");
+---
+
+{isArticles ? null : <Default><slot /></Default>}
