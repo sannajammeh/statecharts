@@ -1,0 +1,13 @@
+---
+import Default from "@astrojs/starlight/components/PageFrame.astro";
+
+const routeId = Astro.locals.starlightRoute.id;
+---
+
+<div data-route-id={routeId}>
+  <Default>
+    <slot name="header" slot="header" />
+    <slot name="sidebar" slot="sidebar" />
+    <slot />
+  </Default>
+</div>

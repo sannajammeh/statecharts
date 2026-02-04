@@ -142,3 +142,39 @@ header.header {
   background: #1F1F1F !important;
   color: #ffffff !important;
 }
+
+/* Articles pages - match landing page layout exactly */
+[data-route-id^="articles"] .page {
+  display: block;
+}
+
+[data-route-id^="articles"] header.header {
+  display: none !important;
+}
+
+[data-route-id^="articles"] .main-frame {
+  padding-top: 0 !important;
+}
+
+[data-route-id^="articles"] main {
+  max-width: none;
+  padding: 0;
+}
+
+[data-route-id^="articles"] .content-panel {
+  padding: 0;
+  border: none !important;
+}
+
+[data-route-id^="articles"] .sl-container {
+  max-width: none;
+  padding: 0;
+}
+
+[data-route-id^="articles"] h1#_top {
+  display: none;
+}
+
+[data-route-id^="articles"] footer {
+  display: none;
+}

@@ -1,0 +1,105 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title } = Astro.props;
+---
+
+<div class="article-layout">
+  <header class="article-header">
+    <a href="/" class="site-title">
+      <img src="/logo.svg" alt="" class="site-logo" />
+      <span>Statecharts.sh</span>
+    </a>
+    <nav class="nav-links">
+      <a href="/docs" class="nav-link">Docs</a>
+      <a href="/articles" class="nav-link">Articles</a>
+    </nav>
+  </header>
+
+  {title && <h1 class="article-title">{title}</h1>}
+
+  <div class="article-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .article-layout {
+    max-width: 56rem;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 4rem;
+    font-family: "Geist Sans", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .article-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .site-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: hsl(0, 0%, 93%);
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .site-logo {
+    width: 1.25rem;
+    height: 1.25rem;
+    filter: invert(1);
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .nav-link {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: hsl(0, 0%, 64%);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-link:hover {
+    color: hsl(0, 0%, 82%);
+  }
+
+  .article-title {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 1.5rem 0;
+    color: hsl(0, 0%, 93%);
+  }
+
+  .article-content {
+    color: hsl(0, 0%, 64%);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .article-content :global(h1),
+  .article-content :global(h2),
+  .article-content :global(h3),
+  .article-content :global(h4),
+  .article-content :global(h5),
+  .article-content :global(h6) {
+    font-family: "Geist Mono", ui-monospace, monospace;
+  }
+</style>
