@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, act, cleanup } from "@testing-library/react";
-import { chart, type Chart, type ChartInstance, type BaseEvent } from "statecharts.sh";
-import { useStateChart } from "../src/index.js";
+import { chart, type Chart, type ChartInstance, type BaseEvent } from "../../index.js";
+import { useStateChart } from "../index.js";
 
 // Context type for our test charts
 type ToggleContext = { count: number };

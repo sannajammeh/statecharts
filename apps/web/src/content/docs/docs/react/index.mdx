@@ -5,10 +5,10 @@ description: Get started with statecharts in React.
 
 ## Installation
 
-Install both the core library and React bindings:
+Install the library:
 
 ```bash
-npm install statecharts.sh @statecharts/react
+npm install statecharts.sh
 ```
 
 ## Basic Usage
@@ -17,7 +17,7 @@ The `useStateChart` hook connects a statechart to your component:
 
 ```tsx
 import { chart } from "statecharts.sh";
-import { useStateChart } from "@statecharts/react";
+import { useStateChart } from "statecharts.sh/react";
 
 const toggle = chart({
   context: {},
