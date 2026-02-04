@@ -5,7 +5,7 @@ import type {
   IStateSnapshot,
   BaseEvent,
   AnyContext,
-} from "statecharts.sh";
+} from "../index.js";
 
 /**
  * Options for useStateChart hook

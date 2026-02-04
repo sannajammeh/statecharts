@@ -44,17 +44,11 @@ instance.send("TIMER")  // → green
 
 ## React
 
-Install the React bindings:
-
-```bash
-npm install @statecharts/react
-```
-
-Use the `useStateChart` hook:
+The React bindings are included in the main package:
 
 ```tsx
 import { chart } from "statecharts.sh"
-import { useStateChart } from "@statecharts/react"
+import { useStateChart } from "statecharts.sh/react"
 
 const trafficLight = chart({
   context: {},
