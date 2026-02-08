@@ -82,6 +82,28 @@ function TrafficLight() {
           <div class="border border-neutral-800 py-3">TypeScript-first</div>
         </div>
 
+        <!-- Bundle Sizes -->
+        <div class="mt-4 grid grid-cols-2 gap-4">
+          <a
+            href="https://bundlejs.com/?q=statecharts.sh%400.0.2&config=%7B%22esbuild%22%3A%7B%22external%22%3A%5B%22react%22%5D%7D%7D"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-between border border-neutral-800 px-4 py-3 transition-colors hover:border-neutral-600"
+          >
+            <span class="text-xs uppercase tracking-wide text-neutral-400">Core</span>
+            <span class="font-mono text-xs text-emerald-400">1.68 kB <span class="text-neutral-500">gzip</span></span>
+          </a>
+          <a
+            href="https://bundlejs.com/?q=statecharts.sh%400.0.2%2Freact&treeshake=%5B*%5D&config=%7B%22esbuild%22%3A%7B%22external%22%3A%5B%22react%22%5D%7D%7D"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-between border border-neutral-800 px-4 py-3 transition-colors hover:border-neutral-600"
+          >
+            <span class="text-xs uppercase tracking-wide text-neutral-400">React Hook</span>
+            <span class="font-mono text-xs text-emerald-400">388 B <span class="text-neutral-500">gzip</span></span>
+          </a>
+        </div>
+
         <!-- Install Commands -->
         <InstallTabs client:load />
 
