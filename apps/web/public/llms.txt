@@ -1,0 +1,304 @@
+# statecharts.sh
+
+> https://statecharts.sh
+> TypeScript statechart library. Deterministic, framework-agnostic, tiny.
+> npm install statecharts.sh
+
+Entry points:
+- "statecharts.sh" — core (chart, instance, types)
+- "statecharts.sh/react" — React hook (useStateChart)
+
+## chart()
+
+```ts
+import { chart } from "statecharts.sh"
+
+const machine = chart<TContext, TEvent>(definition: ChartDefinition<TContext, TEvent>): Chart<TContext, TEvent>
+```
+
+Returns frozen Chart object. Does NOT start execution.
+
+### ChartDefinition
+
+```ts
+interface ChartDefinition<TContext, TEvent> {
+  id?: string;            // machine name, used for absolute #id targets
+  context: TContext;       // initial context data
+  initial: string;         // key of initial top-level state
+  states: Record<string, StateNode<TContext, TEvent>>;
+}
+```
+
+### Chart
+
+```ts
+interface Chart<TContext, TEvent> {
+  readonly definition: ChartDefinition<TContext, TEvent>;
+  start(initialContext?: Partial<TContext>): ChartInstance<TContext, TEvent>;
+}
+```
+
+`start()` creates a running instance. Optional `initialContext` shallow-merges with definition context.
+
+## StateNode
+
+```ts
+interface StateNode<TContext, TEvent> {
+  on?: Record<string, TransitionConfig<TContext, TEvent>>;   // event transitions
+  entry?: Actions<TContext, TEvent>;    // fired on state entry
+  exit?: Actions<TContext, TEvent>;     // fired on state exit (reverse order, leaf→root)
+  after?: Record<number, TransitionConfig<TContext, TEvent>>; // delayed transitions (ms keys)
+  invoke?: InvokeFn<TContext>;          // async invocation (promise or subscription)
+  onDone?: TransitionConfig<TContext, BaseEvent & { data: unknown }>;
+  onError?: TransitionConfig<TContext, BaseEvent & { error: unknown }>;
+  initial?: string;                     // initial child state (compound states)
+  states?: Record<string, StateNode>;   // child states (hierarchical)
+  parallel?: Record<string, { initial: string; states: Record<string, StateNode> }>;
+  final?: boolean;                      // terminal state (sets snapshot.done = true)
+}
+```
+
+Event handling bubbles leaf→root. First matching handler wins.
+
+## Transitions
+
+Three forms:
+
+```ts
+type TransitionConfig =
+  | string                     // target state name
+  | TransitionObject           // { target?, guard?, action? }
+  | TransitionObject[]         // array: first-match-wins
+
+interface TransitionObject<TContext, TEvent> {
+  target?: string;             // target state (undefined = self-transition)
+  guard?: Guard<TContext, TEvent>;
+  action?: Action<TContext, TEvent>;
+}
+```
+
+Target resolution:
+- `"active"` — sibling of current deepest state
+- `"#machineId.stateName"` — absolute from root
+- `undefined` — self-transition (re-enters current path)
+
+Example:
+
+```ts
+on: {
+  SUBMIT: [
+    { target: "error", guard: (ctx) => !ctx.isValid },
+    { target: "success" },  // fallback, no guard = always matches
+  ]
+}
+```
+
+## Actions
+
+```ts
+type Action<TContext, TEvent> = (context: TContext, event: TEvent) => Partial<TContext> | void;
+type Actions<TContext, TEvent> = Action | Action[];
+```
+
+Return `Partial<TContext>` to update context (shallow merge). Return void for side-effects only. No `assign()` helper — just return the partial.
+
+```ts
+entry: (ctx) => ({ count: ctx.count + 1 }),  // context update
+exit: (ctx) => { console.log(ctx) },         // side-effect only
+```
+
+Where actions run:
+- `entry` on StateNode — fires with event `{ type: '__entry__' }`
+- `exit` on StateNode — fires with event `{ type: '__exit__' }`
+- `action` on TransitionObject — fires with the triggering event
+- `after` transitions — fires with event `{ type: '__after__' }`
+
+Multiple actions execute sequentially; each sees context updated by prior actions.
+
+## Guards
+
+```ts
+type Guard<TContext, TEvent> = (context: TContext, event: TEvent) => boolean;
+```
+
+Pure predicate. If false, transition skipped. In array transitions, enables conditional routing (first match wins).
+
+## Context
+
+- Defined as plain object in `ChartDefinition.context`
+- Constrained by `AnyContext = Record<string, unknown>`
+- Each snapshot gets a frozen shallow copy: `Object.freeze({ ...context })`
+- Updated via action return values: `context = { ...context, ...actionResult }`
+- Override at start: `chart.start({ count: 42 })`
+
+## Invoke
+
+```ts
+type InvokeFn<TContext> = (context: TContext) => Promise<unknown> | SubscriptionSource<unknown>;
+
+interface SubscriptionSource<T> {
+  subscribe: (observer: { next: (value: T) => void; error?: (err: unknown) => void }) => Subscription;
+}
+interface Subscription { unsubscribe: () => void; }
+```
+
+Promise-based: resolve → `onDone({ type: '__invoke_done__', data })`, reject → `onError({ type: '__invoke_error__', error })`.
+Subscription-based: each `next(value)` → onDone, `error(err)` → onError.
+Cancelled on state exit. Synchronous throws → onError.
+
+```ts
+states: {
+  loading: {
+    invoke: (ctx) => fetch(`/api/${ctx.id}`).then(r => r.json()),
+    onDone: { target: "success", action: (_, e) => ({ data: e.data }) },
+    onError: { target: "failure", action: (_, e) => ({ error: e.error }) },
+  }
+}
+```
+
+## ChartInstance
+
+```ts
+interface ChartInstance<TContext, TEvent> {
+  readonly state: IStateSnapshot<TContext>;
+  send(event: TEvent | TEvent["type"]): void;
+  subscribe(listener: (state: IStateSnapshot<TContext>) => void): () => void;
+  onTransition(listener: (event: TEvent) => void): () => void;
+  stop(): void;
+}
+```
+
+- `send()` — string auto-wrapped to `{ type }`. No-op after stop. Bubbles leaf→root.
+- `subscribe()` — called on every state change. Returns unsubscribe fn.
+- `onTransition()` — called on every send(), even if no handler found. Returns unsubscribe fn.
+- `stop()` — clears timers, cancels invocations, empties states, final subscriber notification.
+
+```ts
+const instance = machine.start()
+instance.send("NEXT")           // string form
+instance.send({ type: "NEXT" }) // object form
+const unsub = instance.subscribe((snap) => console.log(snap.value))
+instance.stop()
+```
+
+## StateSnapshot
+
+```ts
+interface IStateSnapshot<TContext> {
+  readonly value: StateValue;         // "idle" | { parent: "child" }
+  readonly context: Readonly<TContext>;
+  readonly done: boolean;             // true if leaf state has final: true
+  readonly path: readonly string[];   // ["parent", "child"]
+  readonly timestamp: number;
+  matches(stateValue: string): boolean;
+}
+
+type StateValue = string | { [key: string]: StateValue };
+```
+
+`matches()` behavior:
+- Flat: `matches("idle")` → true if value is "idle"
+- Nested: `matches("parent.child")` → true if path includes both "parent" AND "child"
+- Partial: `matches("parent")` → true if path includes "parent"
+
+## Delayed Transitions
+
+```ts
+after?: Record<number, TransitionConfig>;
+```
+
+Keys = milliseconds. Uses `setTimeout`. Cleared on state exit and stop().
+
+```ts
+states: {
+  loading: {
+    after: {
+      3000: "timeout",
+      5000: { target: "error", action: (ctx) => ({ timedOut: true }) },
+    }
+  }
+}
+```
+
+## Parallel States
+
+```ts
+parallel?: Record<string, {
+  initial: string;
+  states: Record<string, StateNode>;
+}>;
+```
+
+Each key = orthogonal region with its own initial state and child states.
+
+## React Hook
+
+```ts
+import { useStateChart } from "statecharts.sh/react"
+
+function useStateChart<TContext, TEvent>(
+  chartOrInstance: Chart<TContext, TEvent> | ChartInstance<TContext, TEvent>,
+  options?: UseStateChartOptions<TContext, TEvent>,
+): UseStateChartReturn<TContext, TEvent>
+```
+
+### Options
+
+```ts
+interface UseStateChartOptions<TContext, TEvent> {
+  initialContext?: Partial<TContext>;                               // override context (Chart only, ignored for ChartInstance)
+  onTransition?: (prev: IStateSnapshot<TContext>, next: IStateSnapshot<TContext>) => void;
+}
+```
+
+### Return
+
+```ts
+interface UseStateChartReturn<TContext, TEvent> {
+  state: IStateSnapshot<TContext>;
+  send: (event: TEvent | TEvent["type"]) => void;
+  matches: (stateValue: string) => boolean;
+}
+```
+
+### Lifecycle
+
+- **Pass Chart** → hook creates + owns instance. Calls `stop()` on unmount.
+- **Pass ChartInstance** → hook subscribes only. Caller owns lifecycle, no stop on unmount.
+
+Uses `useSyncExternalStore` — SSR compatible, tear-safe. `send` is referentially stable. `matches` updates each state change.
+
+```tsx
+const toggle = chart({
+  context: {},
+  initial: "off",
+  states: {
+    off: { on: { TOGGLE: "on" } },
+    on: { on: { TOGGLE: "off" } },
+  },
+})
+
+function Toggle() {
+  const { state, send, matches } = useStateChart(toggle)
+  return (
+    <button onClick={() => send("TOGGLE")}>
+      {matches("on") ? "ON" : "OFF"}
+    </button>
+  )
+}
+```
+
+### Shared instance pattern
+
+```tsx
+const instance = toggle.start()
+
+function A() {
+  const { state } = useStateChart(instance)
+  return <span>{state.value}</span>
+}
+function B() {
+  const { send } = useStateChart(instance)
+  return <button onClick={() => send("TOGGLE")}>Toggle</button>
+}
+```
